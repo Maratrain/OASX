@@ -43,6 +43,9 @@ class HomeAnalysisController extends GetxController {
   /// selected (the filtered document only contains that task).
   final allDayTaskNames = <String>[].obs;
 
+  /// Task name -> Chinese label, filled from every document we ever parse.
+  final taskLabels = <String, String>{}.obs;
+
   /// Selected run key (`task#index`), `''` shows all runs.
   final selectedRunKey = ''.obs;
 
@@ -95,6 +98,18 @@ class HomeAnalysisController extends GetxController {
     super.onClose();
   }
 
+  /// Records the backend-provided Chinese labels for every task run.
+  void _absorbTaskLabels(ScriptAnalysisDay day) {
+    for (final run in day.runs) {
+      if (run.taskLabel.isNotEmpty) {
+        taskLabels[run.taskName] = run.taskLabel;
+      }
+    }
+  }
+
+  /// Chinese label for a task name, falling back to the raw name.
+  String labelFor(String taskName) => taskLabels[taskName] ?? taskName;
+
   /// Local yyyy-MM-dd key for today.
   String _todayKey() {
     final now = DateTime.now();
@@ -135,6 +150,7 @@ class HomeAnalysisController extends GetxController {
       if (token != _requestToken) {
         return;
       }
+      _absorbTaskLabels(result);
       analysis.value = result;
       if (selectedTaskName.value.isEmpty) {
         allDayTaskNames.assignAll(result.tasks);
@@ -263,6 +279,7 @@ class HomeAnalysisController extends GetxController {
       if (token != _requestToken) {
         return;
       }
+      _absorbTaskLabels(result);
       analysis.value = result;
       if (selectedTaskName.value.isEmpty) {
         allDayTaskNames.assignAll(result.tasks);

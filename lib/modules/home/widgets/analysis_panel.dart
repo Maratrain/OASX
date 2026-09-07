@@ -753,14 +753,7 @@ class _TaskFilterMenu extends StatelessWidget {
       final selected = controller.selectedTaskName.value;
       final tasks = controller.allDayTaskNames;
       String resolveLabel(String taskName) {
-        for (final run in day.runs) {
-          if (run.taskName == taskName) {
-            return run.taskLabel;
-          }
-        }
-        // Filtered document may not contain this task's runs; keep the
-        // cached label or fall back to the raw name.
-        return _cachedTaskLabels[taskName] ?? taskName;
+        return controller.labelFor(taskName);
       }
 
       final selectedLabel =
