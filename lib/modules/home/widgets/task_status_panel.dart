@@ -112,7 +112,9 @@ class _TaskStatusPanelState extends State<TaskStatusPanel> {
   /// Builds the local overview search field above the task list.
   Widget _buildSearchField() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return TextField(
+    return SizedBox(
+      height: 31,
+      child: TextField(
       controller: _searchController,
       style: const TextStyle(fontSize: 12),
       decoration: InputDecoration(
@@ -122,7 +124,7 @@ class _TaskStatusPanelState extends State<TaskStatusPanel> {
           size: 17,
           color: isDark ? const Color(0xFF8A93AB) : const Color(0xFF9AA3B8),
         ),
-        prefixIconConstraints: const BoxConstraints(minWidth: 32),
+        prefixIconConstraints: const BoxConstraints(minWidth: 32, minHeight: 31),
         hintText: I18n.taskSearchHint.tr,
         hintStyle: TextStyle(
           fontSize: 11.5,
@@ -134,7 +136,6 @@ class _TaskStatusPanelState extends State<TaskStatusPanel> {
           horizontal: 10,
           vertical: 0,
         ),
-        constraints: const BoxConstraints(maxHeight: 31),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide(
@@ -155,6 +156,7 @@ class _TaskStatusPanelState extends State<TaskStatusPanel> {
       onChanged: (value) => setState(() {
         _searchQuery = value.trim().toLowerCase();
       }),
+      ),
     );
   }
 

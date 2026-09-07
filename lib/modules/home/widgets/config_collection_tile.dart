@@ -95,7 +95,7 @@ class ConfigCollectionTile extends StatelessWidget {
                       padding: EdgeInsets.fromLTRB(
                         isActive ? 13 : 10,
                         9,
-                        8,
+                        10,
                         9,
                       ),
                       child: Row(

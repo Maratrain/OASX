@@ -11,7 +11,6 @@ import 'package:oasx/modules/home/widgets/config_collection_tile.dart';
 import 'package:oasx/translation/i18n_content.dart';
 
 class ConfigCollectionPanel extends StatefulWidget {
-  static const _compactHeaderThreshold = 220.0;
   static const _visibleStateFilters = [
     HomeScriptStateFilter.all,
     HomeScriptStateFilter.running,
@@ -81,7 +80,7 @@ class _ConfigCollectionPanelState extends State<ConfigCollectionPanel> {
   Widget build(BuildContext context) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.fromLTRB(14, 12, 14, 0),
         child: Obx(() {
           final activeDragPayload = widget.controller.activeDragPayload.value;
           if (activeDragPayload == null) {
@@ -106,7 +105,7 @@ class _ConfigCollectionPanelState extends State<ConfigCollectionPanel> {
                 controller: _listScrollController,
                 itemCount: scripts.length,
                 separatorBuilder: (_, __) => const SizedBox(height: 7),
-                padding: const EdgeInsets.only(bottom: 4),
+                padding: const EdgeInsets.only(bottom: 10),
                 itemBuilder: (context, index) =>
                     _buildDropTargetTile(context, scripts[index]),
               ),
@@ -116,7 +115,7 @@ class _ConfigCollectionPanelState extends State<ConfigCollectionPanel> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildHeader(context),
-              const SizedBox(height: 10),
+              const SizedBox(height: 9),
               _buildSearchField(context),
               const SizedBox(height: 9),
               _buildFilterChips(context),
@@ -255,50 +254,82 @@ class _ConfigCollectionPanelState extends State<ConfigCollectionPanel> {
     _autoScrollDirection = 0;
   }
 
+  /// 设计稿 phead：脚本标题 + 计数胶囊 + 刷新/添加按钮。
   Widget _buildHeader(BuildContext context) {
-    final style = Theme.of(context).textTheme.titleMedium;
-    final separatorStyle = style?.copyWith(
-      color: Theme.of(context).colorScheme.outline,
-      fontWeight: FontWeight.w600,
-    );
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final compactHeader =
-            constraints.maxWidth <
-            ConfigCollectionPanel._compactHeaderThreshold;
-        final title = _HeaderTitle(
-          controller: widget.controller,
-          style: style,
-          separatorStyle: separatorStyle,
-          centered: compactHeader,
-        );
-        final actions = _HeaderActions(
-          controller: widget.controller,
-          refreshingScripts: widget.refreshingScripts,
-          loadingAddScript: widget.loadingAddScript,
-          onRefreshScriptsTap: widget.onRefreshScriptsTap,
-          onAddScriptTap: widget.onAddScriptTap,
-          centered: compactHeader,
-        );
-        if (!compactHeader) {
-          return Row(
-            children: [
-              Expanded(child: title),
-              const SizedBox(width: 8),
-              actions,
-            ],
-          );
-        }
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Center(child: title),
-            const SizedBox(height: 8),
-            Center(child: actions),
-          ],
-        );
-      },
-    );
+    return Obx(() {
+      final total = widget.controller.orderedScripts.length;
+      return Row(
+        children: [
+          Text(
+            I18n.mistScriptTitle.tr,
+            style: const TextStyle(
+              fontSize: 13.5,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 1.5),
+            decoration: BoxDecoration(
+              color: MistPalette.accent.withValues(alpha: 0.10),
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: Text(
+              '$total',
+              style: const TextStyle(
+                fontSize: 10.5,
+                fontWeight: FontWeight.w600,
+                fontFamily: 'Cascadia Code',
+                color: MistPalette.accent,
+              ),
+            ),
+          ),
+          const Spacer(),
+          IconButton(
+            tooltip: I18n.homeConnectionRetryAction.tr,
+            onPressed: widget.refreshingScripts ? null : widget.onRefreshScriptsTap,
+            visualDensity: VisualDensity.compact,
+            constraints: const BoxConstraints.tightFor(width: 30, height: 30),
+            iconSize: 16,
+            icon: widget.refreshingScripts
+                ? const SizedBox(
+                    width: 14,
+                    height: 14,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.refresh_rounded),
+          ),
+          const SizedBox(width: 4),
+          Obx(
+            () => IconButton(
+              tooltip: widget.controller.isLinkModeEnabled.value
+                  ? I18n.closeTheLinker.tr
+                  : I18n.turnOnTheLinker.tr,
+              onPressed: widget.controller.toggleLinkMode,
+              visualDensity: VisualDensity.compact,
+              constraints: const BoxConstraints.tightFor(width: 30, height: 30),
+              iconSize: 16,
+              style: IconButton.styleFrom(
+                backgroundColor: widget.controller.isLinkModeEnabled.value
+                    ? Theme.of(context).colorScheme.primaryContainer
+                    : null,
+                foregroundColor: widget.controller.isLinkModeEnabled.value
+                    ? Theme.of(context).colorScheme.onPrimaryContainer
+                    : null,
+              ),
+              icon: const Icon(Icons.link_rounded),
+            ),
+          ),
+          const SizedBox(width: 4),
+          MistGradientIconButton(
+            icon: Icons.add_rounded,
+            size: 26,
+            tooltip: I18n.configAdd.tr,
+            onPressed: widget.loadingAddScript ? null : widget.onAddScriptTap,
+          ),
+        ],
+      );
+    });
   }
 
   /// 圆角玻璃搜索框（设计稿 B 左栏样式）。
@@ -382,138 +413,6 @@ class _ConfigCollectionPanelState extends State<ConfigCollectionPanel> {
       HomeScriptStateFilter.stopped => I18n.mistFilterStopped.tr,
       HomeScriptStateFilter.offline => I18n.mistFilterAbnormal.tr,
     };
-  }
-}
-
-class _HeaderTitle extends StatelessWidget {
-  const _HeaderTitle({
-    required this.controller,
-    required this.style,
-    required this.separatorStyle,
-    required this.centered,
-  });
-
-  final HomeDashboardController controller;
-  final TextStyle? style;
-  final TextStyle? separatorStyle;
-  final bool centered;
-
-  @override
-  Widget build(BuildContext context) {
-    return Wrap(
-      alignment: centered ? WrapAlignment.center : WrapAlignment.start,
-      crossAxisAlignment: WrapCrossAlignment.center,
-      spacing: 8,
-      runSpacing: 4,
-      children: [
-        Text(I18n.scriptList.tr, style: style),
-        Text.rich(
-          TextSpan(
-            children: [
-              TextSpan(
-                text:
-                    '${controller.countScriptsByState(HomeScriptStateFilter.running)}',
-                style: style?.copyWith(
-                  color: Colors.green.shade600,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              TextSpan(text: '/', style: separatorStyle),
-              TextSpan(
-                text:
-                    '${controller.countScriptsByState(HomeScriptStateFilter.stopped)}',
-                style: style?.copyWith(
-                  color: Theme.of(context).colorScheme.outline,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              TextSpan(text: '/', style: separatorStyle),
-              TextSpan(
-                text:
-                    '${controller.countScriptsByState(HomeScriptStateFilter.abnormal)}',
-                style: style?.copyWith(
-                  color: Colors.orange.shade700,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _HeaderActions extends StatelessWidget {
-  const _HeaderActions({
-    required this.controller,
-    required this.refreshingScripts,
-    required this.loadingAddScript,
-    required this.onRefreshScriptsTap,
-    required this.onAddScriptTap,
-    required this.centered,
-  });
-
-  final HomeDashboardController controller;
-  final bool refreshingScripts;
-  final bool loadingAddScript;
-  final VoidCallback onRefreshScriptsTap;
-  final VoidCallback onAddScriptTap;
-  final bool centered;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: centered
-          ? MainAxisAlignment.center
-          : MainAxisAlignment.end,
-      children: [
-        IconButton(
-          tooltip: I18n.homeConnectionRetryAction.tr,
-          onPressed: refreshingScripts ? null : onRefreshScriptsTap,
-          visualDensity: VisualDensity.compact,
-          constraints: const BoxConstraints.tightFor(width: 36, height: 36),
-          icon: refreshingScripts
-              ? const SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              : const Icon(Icons.refresh_rounded),
-        ),
-        IconButton(
-          tooltip: controller.isLinkModeEnabled.value
-              ? I18n.closeTheLinker.tr
-              : I18n.turnOnTheLinker.tr,
-          onPressed: controller.toggleLinkMode,
-          visualDensity: VisualDensity.compact,
-          constraints: const BoxConstraints.tightFor(width: 36, height: 36),
-          style: IconButton.styleFrom(
-            backgroundColor: controller.isLinkModeEnabled.value
-                ? Theme.of(context).colorScheme.primaryContainer
-                : null,
-            foregroundColor: controller.isLinkModeEnabled.value
-                ? Theme.of(context).colorScheme.onPrimaryContainer
-                : null,
-          ),
-          icon: const Icon(Icons.link_rounded),
-        ),
-        IconButton(
-          tooltip: I18n.configAdd.tr,
-          onPressed: loadingAddScript ? null : onAddScriptTap,
-          visualDensity: VisualDensity.compact,
-          constraints: const BoxConstraints.tightFor(width: 36, height: 36),
-          icon: loadingAddScript
-              ? const SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              : const Icon(Icons.add_rounded),
-        ),
-      ],
-    );
   }
 }
 

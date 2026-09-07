@@ -146,6 +146,7 @@ final Map<String, String> _us_ui = {
   I18n.mistMetricCountUnit: '',
   I18n.mistTaskCountUnit: ' tasks',
   I18n.mistUpdate: 'Update',
+  I18n.mistScriptTitle: 'Scripts',
   I18n.homeEmptyScriptHint: 'Add a config first',
   I18n.homeLoadingAutoDeploying: 'Auto deployment in progress, please wait',
   I18n.homeGoDeployPage: 'Go to deploy page',

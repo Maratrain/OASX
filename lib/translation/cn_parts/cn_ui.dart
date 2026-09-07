@@ -211,6 +211,7 @@ final Map<String, String> _cn_ui = {
   I18n.mistMetricCountUnit: '个',
   I18n.mistTaskCountUnit: '项',
   I18n.mistUpdate: '更新',
+  I18n.mistScriptTitle: '脚本',
   I18n.homeEmptyScriptHint: '请先添加一个配置',
   I18n.homeLoadingAutoDeploying: '正在自动部署，请稍后',
   I18n.homeGoDeployPage: '前往部署页面',

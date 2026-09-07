@@ -67,7 +67,7 @@ class _PrimaryNavigationShellState extends State<PrimaryNavigationShell> {
                 ? Row(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.fromLTRB(10, 10, 0, 12),
+                        padding: const EdgeInsets.fromLTRB(9, 14, 0, 12),
                         child: _PrimaryNavigationRail(
                           selectedIndex: selectedIndex,
                           onSelected: _handleDestinationSelected,
@@ -256,15 +256,15 @@ class _RailItem extends StatelessWidget {
     final color = selected
         ? Colors.white
         : (isDark ? const Color(0xFF8A93AB) : const Color(0xFF9AA3B8));
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 6),
+    return SizedBox(
+      width: 46,
+      height: 50,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(13),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 180),
           curve: Curves.easeOut,
-          height: 50,
           decoration: selected
               ? MistDecor.accentCapsule(radius: 13)
               : BoxDecoration(borderRadius: BorderRadius.circular(13)),
