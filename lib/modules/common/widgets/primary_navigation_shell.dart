@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:oasx/config/theme.dart';
 import 'package:oasx/modules/common/widgets/appbar.dart';
 import 'package:oasx/modules/home/index.dart';
 import 'package:oasx/modules/home/models/home_workbench_layout.dart';
@@ -56,28 +57,31 @@ class _PrimaryNavigationShellState extends State<PrimaryNavigationShell> {
           selectedIndex: selectedIndex,
           builtIndexes: _builtIndexes,
         );
-        return Scaffold(
-          appBar: buildPlatformAppBar(context, routePath: _routePath),
-          resizeToAvoidBottomInset: false,
-          body: showRail
-              ? Row(
-                  children: [
-                    _PrimaryNavigationRail(
-                      selectedIndex: selectedIndex,
-                      onSelected: _handleDestinationSelected,
-                    ),
-                    const VerticalDivider(width: 1),
-                    Expanded(child: content),
-                  ],
-                )
-              : content,
-          bottomNavigationBar: showRail
-              ? null
-              : NavigationBar(
-                  selectedIndex: selectedIndex,
-                  onDestinationSelected: _handleDestinationSelected,
-                  destinations: _destinations(),
-                ),
+        return MistBackground(
+          child: Scaffold(
+            backgroundColor: Colors.transparent,
+            appBar: buildPlatformAppBar(context, routePath: _routePath),
+            resizeToAvoidBottomInset: false,
+            body: showRail
+                ? Row(
+                    children: [
+                      _PrimaryNavigationRail(
+                        selectedIndex: selectedIndex,
+                        onSelected: _handleDestinationSelected,
+                      ),
+                      const VerticalDivider(width: 1),
+                      Expanded(child: content),
+                    ],
+                  )
+                : content,
+            bottomNavigationBar: showRail
+                ? null
+                : NavigationBar(
+                    selectedIndex: selectedIndex,
+                    onDestinationSelected: _handleDestinationSelected,
+                    destinations: _destinations(),
+                  ),
+          ),
         );
       },
     );
