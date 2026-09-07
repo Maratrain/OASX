@@ -75,6 +75,8 @@ class _AnalysisBody extends StatelessWidget {
               fontWeight: FontWeight.w700,
             ),
           ),
+          const SizedBox(width: 8),
+          _TaskFilterMenu(controller: controller, day: day),
           const Spacer(),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
@@ -727,5 +729,109 @@ class _AnalysisPlaceholder extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+/// Dropdown that filters analysis data by task; empty shows all tasks.
+class _TaskFilterMenu extends StatelessWidget {
+  const _TaskFilterMenu({required this.controller, required this.day});
+
+  final HomeAnalysisController controller;
+  final ScriptAnalysisDay day;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Obx(() {
+      final selected = controller.selectedTaskName.value;
+      final tasks = day.tasks;
+      final selectedLabel = selected.isEmpty
+          ? I18n.homeAnalysisAllTasks.tr
+          : tasks.fold(
+              I18n.homeAnalysisAllTasks.tr,
+              (label, taskName) {
+                for (final run in day.runs) {
+                  if (run.taskName == selected) {
+                    return run.taskLabel;
+                  }
+                }
+                return selected;
+              },
+            );
+      return PopupMenuButton<String>(
+        tooltip: I18n.homeAnalysisAllTasks.tr,
+        initialValue: selected,
+        onSelected: (value) {
+          if (value == selected) {
+            return;
+          }
+          if (value.isEmpty) {
+            controller.clearTaskFilter();
+          } else {
+            controller.selectTask(value);
+          }
+        },
+        itemBuilder: (context) => [
+          PopupMenuItem(
+            value: '',
+            child: Text(
+              I18n.homeAnalysisAllTasks.tr,
+              style: selected.isEmpty
+                  ? TextStyle(
+                      color: theme.colorScheme.primary,
+                      fontWeight: FontWeight.w700,
+                    )
+                  : null,
+            ),
+          ),
+          ...tasks.map(
+            (taskName) {
+              var label = taskName;
+              for (final run in day.runs) {
+                if (run.taskName == taskName) {
+                  label = run.taskLabel;
+                  break;
+                }
+              }
+              return PopupMenuItem(
+                value: taskName,
+                child: Text(
+                  label,
+                  style: selected == taskName
+                      ? TextStyle(
+                          color: theme.colorScheme.primary,
+                          fontWeight: FontWeight.w700,
+                        )
+                      : null,
+                ),
+              );
+            },
+          ),
+        ],
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surfaceContainerHighest
+                .withValues(alpha: 0.6),
+            borderRadius: BorderRadius.circular(999),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                selectedLabel,
+                style: theme.textTheme.labelSmall,
+              ),
+              const SizedBox(width: 4),
+              Icon(
+                Icons.arrow_drop_down,
+                size: 16,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ],
+          ),
+        ),
+      );
+    });
   }
 }

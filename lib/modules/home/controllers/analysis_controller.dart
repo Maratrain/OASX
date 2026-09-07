@@ -60,6 +60,9 @@ class HomeAnalysisController extends GetxController {
   final replayState = ScriptAnalysisReplayState.idle.obs;
 
   Timer? _replayTimer;
+
+  /// Periodic refresh for today's data (task ops keep flowing while running).
+  Timer? _todayRefreshTimer;
   Worker? _dashboardWorker;
   String _boundScriptName = '';
   int _bindingRevision = 0;
@@ -82,8 +85,62 @@ class HomeAnalysisController extends GetxController {
   @override
   void onClose() {
     _replayTimer?.cancel();
+    _todayRefreshTimer?.cancel();
     _dashboardWorker?.dispose();
     super.onClose();
+  }
+
+  /// Local yyyy-MM-dd key for today.
+  String _todayKey() {
+    final now = DateTime.now();
+    return '${now.year.toString().padLeft(4, '0')}-'
+        '${now.month.toString().padLeft(2, '0')}-'
+        '${now.day.toString().padLeft(2, '0')}';
+  }
+
+  void _syncTodayRefresh(bool enabled) {
+    if (!enabled) {
+      _todayRefreshTimer?.cancel();
+      _todayRefreshTimer = null;
+      return;
+    }
+    if (_todayRefreshTimer != null) {
+      return;
+    }
+    _todayRefreshTimer = Timer.periodic(
+      const Duration(seconds: 5),
+      (_) => unawaited(_refreshTodayQuietly()),
+    );
+  }
+
+  /// Reloads today's document without flickering the playhead state.
+  Future<void> _refreshTodayQuietly() async {
+    if (_boundScriptName.isEmpty || selectedDateKey.value != _todayKey()) {
+      _todayRefreshTimer?.cancel();
+      _todayRefreshTimer = null;
+      return;
+    }
+    final token = ++_requestToken;
+    try {
+      final result = await ApiClient().getScriptAnalysisDay(
+        _boundScriptName,
+        selectedDateKey.value,
+        taskName: selectedTaskName.value,
+      );
+      if (token != _requestToken) {
+        return;
+      }
+      analysis.value = result;
+      if (selectedRunKey.value.isNotEmpty) {
+        final stillThere =
+            result.runs.any((run) => run.key == selectedRunKey.value);
+        if (!stillThere) {
+          selectedRunKey.value = '';
+        }
+      }
+    } catch (_) {
+      // Quiet refresh: keep showing the last good document.
+    }
   }
 
   /// Script currently bound to this controller.
@@ -114,19 +171,6 @@ class HomeAnalysisController extends GetxController {
       }
     }
     return day.operations;
-  }
-
-  ScriptAnalysisRun? _findRun(String key) {
-    final day = analysis.value;
-    if (day == null) {
-      return null;
-    }
-    for (final run in day.runs) {
-      if (run.key == key) {
-        return run;
-      }
-    }
-    return null;
   }
 
   /// Total replay window in milliseconds (first to last visible operation).
@@ -213,6 +257,7 @@ class HomeAnalysisController extends GetxController {
       analysis.value = result;
       selectedRunKey.value = '';
       _resetReplay();
+      _syncTodayRefresh(result.dateKey == _todayKey());
     } catch (error) {
       if (token == _requestToken) {
         lastErrorMessage.value = '$error';
