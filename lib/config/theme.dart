@@ -61,10 +61,10 @@ abstract final class MistPalette {
   static const lightRailGlass = Color(0x73FFFFFF); // 白 45%
   static const darkRailGlass = Color(0x0DFFFFFF); // 白 5%
 
-  /// 渐变光斑（页面四角的柔色晕染）。
-  static const lightGlowViolet = Color(0x4D7C5BFA);
-  static const lightGlowBlue = Color(0x523898FF);
-  static const lightGlowGreen = Color(0x2E12B26B);
+  /// 渐变光斑（页面四角的柔色晕染，透明度对齐设计稿 14%/14%/8%）。
+  static const lightGlowViolet = Color(0x247C5BFA);
+  static const lightGlowBlue = Color(0x243898FF);
+  static const lightGlowGreen = Color(0x1412B26B);
   static const darkGlowViolet = Color(0x4D7C5BFA);
   static const darkGlowBlue = Color(0x453898FF);
   static const darkGlowGreen = Color(0x2E18B26B);
