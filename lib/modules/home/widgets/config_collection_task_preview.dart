@@ -17,20 +17,23 @@ class ConfigCollectionTaskPreview extends StatelessWidget {
   Widget build(BuildContext context) {
     return Obx(() {
       final preview = _firstTaskPreview(script);
+      final isDark = Theme.of(context).brightness == Brightness.dark;
+      final grey =
+          isDark ? const Color(0xFF8A93AB) : const Color(0xFF9AA3B8);
       if (preview == null) {
         return Text(
           I18n.homeNoTask.tr,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           softWrap: false,
-          style: Theme.of(context).textTheme.bodyMedium,
+          style: TextStyle(fontSize: 11, color: grey),
         );
       }
       return Row(
         children: [
           Icon(
             preview.icon,
-            size: 14,
+            size: 12,
             color: preview.color,
           ),
           const SizedBox(width: 4),
@@ -40,7 +43,7 @@ class ConfigCollectionTaskPreview extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               softWrap: false,
-              style: Theme.of(context).textTheme.labelMedium,
+              style: TextStyle(fontSize: 11, color: grey),
             ),
           ),
         ],

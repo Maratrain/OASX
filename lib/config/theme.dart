@@ -82,6 +82,11 @@ abstract final class MistPalette {
     colors: [accent, accent2],
   );
   static const runGreen = Color(0xFF18B26B);
+  static const runGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFF2BD183), runGreen],
+  );
   static const warnOrange = Color(0xFFE8930C);
   static const stopGrey = Color(0xFF9AA3B8);
 }

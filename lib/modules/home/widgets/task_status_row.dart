@@ -8,7 +8,6 @@ import 'package:oasx/modules/common/models/config_drag_payload.dart';
 import 'package:oasx/modules/common/widgets/drag_copy_feedback.dart';
 import 'package:oasx/modules/common/widgets/mist_glass.dart';
 import 'package:oasx/modules/home/controllers/dashboard_controller.dart';
-import 'package:oasx/modules/home/widgets/split_scroll_row.dart';
 import 'package:oasx/modules/home/widgets/task_status_swipe_container.dart';
 import 'package:oasx/translation/i18n_content.dart';
 
@@ -69,7 +68,6 @@ class TaskStatusRow extends StatelessWidget {
   final bool dragEnabled;
   final bool swipeEnabled;
   final ConfigDragPayload? activeDragPayload;
-  static const double _actionExtent = 268;
 
   @override
   Widget build(BuildContext context) {
@@ -102,26 +100,12 @@ class TaskStatusRow extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(14, 11, 10, 11),
-              child: SplitScrollRow(
-                minHeight: 40,
-                trailingExtent: _actionExtent,
-                trailingBackgroundColor: rowColor,
-                trailing: _TaskActionBar(
-                  stateColor: stateColor,
-                  onQuickRun: !quickScheduleLocked && canQuickSchedule
-                      ? () => onQuickRun(task.name)
-                      : null,
-                  onQuickWait: !quickScheduleLocked && canQuickSchedule
-                      ? () => onQuickWait(task.name)
-                      : null,
-                  onEditTask: () => onEditTask(task.name),
-                ),
-                leading: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    _TaskTypeIcon(type: task.type, stateColor: stateColor),
-                    const SizedBox(width: 11),
-                    _TaskMeta(
+              child: Row(
+                children: [
+                  _TaskTypeIcon(type: task.type, stateColor: stateColor),
+                  const SizedBox(width: 11),
+                  Expanded(
+                    child: _TaskMeta(
                       controller: controller,
                       sourceScriptName: sourceScriptName,
                       task: task,
@@ -129,8 +113,25 @@ class TaskStatusRow extends StatelessWidget {
                       onSetNextRun: onSetNextRun,
                       dragEnabled: dragEnabled,
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    fit: FlexFit.loose,
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: _TaskActionBar(
+                        stateColor: stateColor,
+                        onQuickRun: !quickScheduleLocked && canQuickSchedule
+                            ? () => onQuickRun(task.name)
+                            : null,
+                        onQuickWait: !quickScheduleLocked && canQuickSchedule
+                            ? () => onQuickWait(task.name)
+                            : null,
+                        onEditTask: () => onEditTask(task.name),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],

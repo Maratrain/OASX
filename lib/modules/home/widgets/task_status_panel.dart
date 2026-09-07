@@ -329,59 +329,105 @@ class _OverviewMetricCard extends StatelessWidget {
             nextSchedule = times.first;
           }
         }
-        return OverflowBar(
-          alignment: MainAxisAlignment.spaceBetween,
-          spacing: 14,
-          overflowSpacing: 8,
-          children: [
-            _masterSwitch(context),
-            _verticalDivider(isDark),
-            _metric(
-              context,
-              I18n.mistMetricRunningTasks.tr,
-              '$runningCount',
-              suffix: ' / $enabledTotal ${I18n.mistMetricEnabled.tr}',
+        return LayoutBuilder(
+          builder: (context, constraints) => SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minWidth: constraints.maxWidth,
             ),
-            _verticalDivider(isDark),
-            _metric(
-              context,
-              I18n.mistMetricControlScripts.tr,
-              '${controller.validControlScriptCount}',
-              suffix: ' ${I18n.mistMetricCountUnit.tr}',
+            child: IntrinsicWidth(
+            child: Row(
+              children: [
+                _masterSwitch(context),
+                const SizedBox(width: 16),
+                _verticalDivider(isDark),
+                const SizedBox(width: 16),
+                _metric(
+                  context,
+                  I18n.mistMetricRunningTasks.tr,
+                  '$runningCount',
+                  suffix: ' / $enabledTotal ${I18n.mistMetricEnabled.tr}',
+                ),
+                const SizedBox(width: 16),
+                _verticalDivider(isDark),
+                const SizedBox(width: 16),
+                _metric(
+                  context,
+                  I18n.mistMetricControlScripts.tr,
+                  '${controller.validControlScriptCount}',
+                  suffix: ' ${I18n.mistMetricCountUnit.tr}',
+                ),
+                const Spacer(),
+                _metric(
+                  context,
+                  I18n.mistMetricNextSchedule.tr,
+                  nextSchedule.isEmpty ? '—' : nextSchedule,
+                  accent: true,
+                ),
+              ],
             ),
-            _metric(
-              context,
-              I18n.mistMetricNextSchedule.tr,
-              nextSchedule.isEmpty ? '—' : nextSchedule,
-              accent: true,
             ),
-          ],
+          ),
+          ),
         );
       }),
     );
   }
 
   Widget _masterSwitch(BuildContext context) {
-    return Obx(
-      () => Column(
+    return Obx(() {
+      final isDark = Theme.of(context).brightness == Brightness.dark;
+      final on = controller.isAllControlScriptsRunning();
+      final enabled = !controller.isBatchSwitching.value;
+      return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
           _metricLabel(context, I18n.mistMetricMaster.tr),
-          Transform.scale(
-            scale: 0.72,
-            alignment: Alignment.centerLeft,
-            child: Switch(
-              value: controller.isAllControlScriptsRunning(),
-              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              onChanged: controller.isBatchSwitching.value
-                  ? null
-                  : (value) => controller.toggleAllControlScripts(value),
+          const SizedBox(height: 2),
+          GestureDetector(
+            onTap: enabled
+                ? () => controller.toggleAllControlScripts(!on)
+                : null,
+            child: Container(
+              width: 40,
+              height: 22,
+              padding: const EdgeInsets.all(2.5),
+              decoration: BoxDecoration(
+                gradient: on ? MistPalette.runGradient : null,
+                color: on
+                    ? null
+                    : (isDark
+                        ? const Color(0x1FFFFFFF)
+                        : const Color(0x14232A3B)),
+                borderRadius: BorderRadius.circular(999),
+                boxShadow: on
+                    ? [
+                        BoxShadow(
+                          color: MistPalette.runGreen.withValues(alpha: 0.4),
+                          blurRadius: 10,
+                          offset: const Offset(0, 3),
+                        ),
+                      ]
+                    : null,
+              ),
+              child: Align(
+                alignment: on ? Alignment.centerRight : Alignment.centerLeft,
+                child: Container(
+                  width: 17,
+                  height: 17,
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ),
             ),
           ),
         ],
-      ),
-    );
+      );
+    });
   }
 
   Widget _metric(

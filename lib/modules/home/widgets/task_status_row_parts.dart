@@ -49,7 +49,7 @@ class _TaskMeta extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            I18n.nextRun.tr,
+            I18n.mistNextRunShort.tr,
             style: TextStyle(
               fontSize: 11,
               color: isDark ? const Color(0xFF8A93AB) : const Color(0xFF9AA3B8),
@@ -152,13 +152,13 @@ class _TaskActionBar extends StatelessWidget {
             primary: true,
             onPressed: onQuickRun,
           ),
-        if (onQuickRun != null) const SizedBox(width: 6),
+        if (onQuickRun != null) const SizedBox(width: 5),
         _MiniPillButton(
           icon: Icons.schedule_rounded,
           label: I18n.homeQuickWait.tr,
           onPressed: onQuickWait,
         ),
-        const SizedBox(width: 6),
+        const SizedBox(width: 5),
         _MiniPillButton(
           icon: Icons.tune_rounded,
           label: I18n.homeOpenTaskParams.tr,
@@ -188,7 +188,7 @@ class _MiniPillButton extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final Widget content = Container(
       height: 26,
-      padding: const EdgeInsets.symmetric(horizontal: 11),
+      padding: const EdgeInsets.symmetric(horizontal: 9),
       decoration: primary
           ? MistDecor.accentCapsule(radius: 8)
           : BoxDecoration(

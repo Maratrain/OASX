@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:oasx/config/theme.dart';
 import 'package:oasx/modules/home/controllers/dashboard_controller.dart';
 import 'package:oasx/modules/home/models/config_model.dart';
-import 'package:oasx/modules/home/widgets/config_collection_script_label.dart';
 import 'package:oasx/modules/home/widgets/config_collection_task_preview.dart';
 import 'package:oasx/translation/i18n_content.dart';
 
@@ -126,6 +125,7 @@ class ConfigCollectionTile extends StatelessWidget {
                                     script: script,
                                     accentColor: accentColor,
                                     powerButton: _PowerButton(
+                                      script: script,
                                       onTogglePower: onTogglePower,
                                     ),
                                     popupButton: _ActionMenuButton(
@@ -192,7 +192,16 @@ class _ScriptMeta extends StatelessWidget {
             _StateDot(color: accentColor),
             const SizedBox(width: 8),
             Expanded(
-              child: ConfigCollectionScriptLabel(script: script, centered: false),
+              child: Text(
+                script.name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                softWrap: false,
+                style: const TextStyle(
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
             powerButton,
             popupButton,
@@ -337,19 +346,29 @@ class _StateDot extends StatelessWidget {
 }
 
 class _PowerButton extends StatelessWidget {
-  const _PowerButton({required this.onTogglePower});
+  const _PowerButton({required this.script, required this.onTogglePower});
 
+  final ScriptModel script;
   final VoidCallback onTogglePower;
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      onPressed: onTogglePower,
-      visualDensity: VisualDensity.compact,
-      constraints: const BoxConstraints.tightFor(width: 32, height: 32),
-      padding: EdgeInsets.zero,
-      iconSize: 23,
-      icon: const Icon(Icons.power_settings_new_rounded),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final running = script.state.value == ScriptState.running;
+    return InkWell(
+      onTap: onTogglePower,
+      borderRadius: BorderRadius.circular(7),
+      child: SizedBox(
+        width: 22,
+        height: 22,
+        child: Icon(
+          Icons.power_settings_new_rounded,
+          size: 13,
+          color: running
+              ? MistPalette.runGreen
+              : (isDark ? const Color(0xFF8A93AB) : const Color(0xFF9AA3B8)),
+        ),
+      ),
     );
   }
 }
@@ -368,11 +387,11 @@ class _ActionMenuButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox.square(
-      dimension: 32,
+      dimension: 22,
       child: PopupMenuButton<String>(
         padding: EdgeInsets.zero,
         tooltip: '',
-        icon: const Icon(Icons.more_vert_rounded, size: 18),
+        icon: const Icon(Icons.more_vert_rounded, size: 14),
         onSelected: (value) async {
           if (value == 'rename') {
             onRename();

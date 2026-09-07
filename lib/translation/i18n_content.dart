@@ -187,7 +187,8 @@ class I18n {
       mistMetricCountUnit = 'mist_metric_count_unit',
       mistTaskCountUnit = 'mist_task_count_unit',
       mistUpdate = 'mist_update',
-      mistScriptTitle = 'mist_script_title';
+      mistScriptTitle = 'mist_script_title',
+      mistNextRunShort = 'mist_next_run_short';
   static const String homeStatusTab = 'home_status_tab',
       homeTasksTab = 'home_tasks_tab',
       homeParamsTab = 'home_params_tab';
