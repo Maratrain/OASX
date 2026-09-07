@@ -38,6 +38,11 @@ class HomeAnalysisController extends GetxController {
   /// Task filter (`''` shows all tasks).
   final selectedTaskName = ''.obs;
 
+  /// All task names seen on the selected day, from the unfiltered document.
+  /// Kept separate so the filter menu keeps every option while one task is
+  /// selected (the filtered document only contains that task).
+  final allDayTaskNames = <String>[].obs;
+
   /// Selected run key (`task#index`), `''` shows all runs.
   final selectedRunKey = ''.obs;
 
@@ -131,6 +136,9 @@ class HomeAnalysisController extends GetxController {
         return;
       }
       analysis.value = result;
+      if (selectedTaskName.value.isEmpty) {
+        allDayTaskNames.assignAll(result.tasks);
+      }
       if (selectedRunKey.value.isNotEmpty) {
         final stillThere =
             result.runs.any((run) => run.key == selectedRunKey.value);
@@ -205,6 +213,7 @@ class HomeAnalysisController extends GetxController {
     final bindingRevision = ++_bindingRevision;
     _boundScriptName = scriptName;
     selectedTaskName.value = '';
+    allDayTaskNames.clear();
     selectedRunKey.value = '';
     replayOffsetMs.value = 0;
     replayState.value = ScriptAnalysisReplayState.idle;
@@ -255,6 +264,9 @@ class HomeAnalysisController extends GetxController {
         return;
       }
       analysis.value = result;
+      if (selectedTaskName.value.isEmpty) {
+        allDayTaskNames.assignAll(result.tasks);
+      }
       selectedRunKey.value = '';
       _resetReplay();
       _syncTodayRefresh(result.dateKey == _todayKey());
@@ -277,6 +289,7 @@ class HomeAnalysisController extends GetxController {
     }
     selectedDateKey.value = dateKey;
     selectedTaskName.value = '';
+    allDayTaskNames.clear();
     selectedRunKey.value = '';
     await loadAnalysis();
   }

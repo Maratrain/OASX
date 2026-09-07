@@ -732,6 +732,10 @@ class _AnalysisPlaceholder extends StatelessWidget {
   }
 }
 
+/// Labels for task names seen in unfiltered documents, so the menu can
+/// still show readable names for tasks hidden by the active filter.
+final Map<String, String> _cachedTaskLabels = <String, String>{};
+
 /// Dropdown that filters analysis data by task; empty shows all tasks.
 class _TaskFilterMenu extends StatelessWidget {
   const _TaskFilterMenu({required this.controller, required this.day});
@@ -742,22 +746,25 @@ class _TaskFilterMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    for (final run in day.runs) {
+      _cachedTaskLabels[run.taskName] = run.taskLabel;
+    }
     return Obx(() {
       final selected = controller.selectedTaskName.value;
-      final tasks = day.tasks;
-      final selectedLabel = selected.isEmpty
-          ? I18n.homeAnalysisAllTasks.tr
-          : tasks.fold(
-              I18n.homeAnalysisAllTasks.tr,
-              (label, taskName) {
-                for (final run in day.runs) {
-                  if (run.taskName == selected) {
-                    return run.taskLabel;
-                  }
-                }
-                return selected;
-              },
-            );
+      final tasks = controller.allDayTaskNames;
+      String resolveLabel(String taskName) {
+        for (final run in day.runs) {
+          if (run.taskName == taskName) {
+            return run.taskLabel;
+          }
+        }
+        // Filtered document may not contain this task's runs; keep the
+        // cached label or fall back to the raw name.
+        return _cachedTaskLabels[taskName] ?? taskName;
+      }
+
+      final selectedLabel =
+          selected.isEmpty ? I18n.homeAnalysisAllTasks.tr : resolveLabel(selected);
       return PopupMenuButton<String>(
         tooltip: I18n.homeAnalysisAllTasks.tr,
         initialValue: selected,
@@ -786,13 +793,7 @@ class _TaskFilterMenu extends StatelessWidget {
           ),
           ...tasks.map(
             (taskName) {
-              var label = taskName;
-              for (final run in day.runs) {
-                if (run.taskName == taskName) {
-                  label = run.taskLabel;
-                  break;
-                }
-              }
+              final label = resolveLabel(taskName);
               return PopupMenuItem(
                 value: taskName,
                 child: Text(
