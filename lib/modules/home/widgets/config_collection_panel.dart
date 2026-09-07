@@ -376,11 +376,11 @@ class _ConfigCollectionPanelState extends State<ConfigCollectionPanel> {
 
   String _stateLabel(HomeScriptStateFilter value) {
     return switch (value) {
-      HomeScriptStateFilter.all => I18n.selectAll.tr,
-      HomeScriptStateFilter.running => I18n.run.tr,
-      HomeScriptStateFilter.abnormal => I18n.homeScriptAbnormal.tr,
-      HomeScriptStateFilter.stopped => I18n.stop.tr,
-      HomeScriptStateFilter.offline => I18n.homeScriptOffline.tr,
+      HomeScriptStateFilter.all => I18n.mistFilterAll.tr,
+      HomeScriptStateFilter.running => I18n.mistFilterRunning.tr,
+      HomeScriptStateFilter.abnormal => I18n.mistFilterAbnormal.tr,
+      HomeScriptStateFilter.stopped => I18n.mistFilterStopped.tr,
+      HomeScriptStateFilter.offline => I18n.mistFilterAbnormal.tr,
     };
   }
 }

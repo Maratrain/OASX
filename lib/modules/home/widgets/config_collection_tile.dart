@@ -211,8 +211,78 @@ class _ScriptMeta extends StatelessWidget {
             child: ConfigCollectionTaskPreview(script: script),
           ),
         ),
+        const SizedBox(height: 6),
+        _ScriptAbbrChips(script: script),
       ],
     );
+  }
+}
+
+/// 磁贴底部摘要 chips：已启用任务数 + 最近一次调度时间（设计稿 .sabbr）。
+class _ScriptAbbrChips extends StatelessWidget {
+  const _ScriptAbbrChips({required this.script});
+
+  final ScriptModel script;
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(() {
+      final isDark = Theme.of(context).brightness == Brightness.dark;
+      final bg = isDark ? const Color(0x0DFFFFFF) : const Color(0x0D1E2846);
+      final fg =
+          isDark ? const Color(0xFF8A93AB) : const Color(0xFF9AA3B8);
+      var enabledCount = script.pendingTaskList.length +
+          script.waitingTaskList.length;
+      if (script.runningTask.value.taskName.value.trim().isNotEmpty) {
+        enabledCount += 1;
+      }
+      final times = <String>[
+        for (final task in script.pendingTaskList)
+          if (task.nextRun.value.trim().isNotEmpty) task.nextRun.value,
+        for (final task in script.waitingTaskList)
+          if (task.nextRun.value.trim().isNotEmpty) task.nextRun.value,
+      ]..sort();
+      final chips = <Widget>[
+        _abbrChip(
+          '$enabledCount${I18n.mistTaskCountUnit.tr}',
+          bg,
+          fg,
+        ),
+      ];
+      if (times.isNotEmpty) {
+        chips.add(_abbrChip(_shortTime(times.first), bg, fg));
+      }
+      return Wrap(spacing: 5, runSpacing: 4, children: chips);
+    });
+  }
+
+  Widget _abbrChip(String text, Color bg, Color fg) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 9.5,
+          fontFamily: 'Cascadia Code',
+          color: fg,
+        ),
+      ),
+    );
+  }
+
+  String _shortTime(String raw) {
+    final match = RegExp(r'\d{2}:\d{2}').allMatches(raw).toList();
+    if (raw.length >= 10) {
+      final date = raw.substring(5, 10);
+      final time =
+          match.isNotEmpty ? match.last.group(0) : (raw.length >= 16 ? raw.substring(11, 16) : '');
+      return '$date $time'.trim();
+    }
+    return raw;
   }
 }
 

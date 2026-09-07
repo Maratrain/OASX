@@ -69,7 +69,7 @@ class TaskStatusRow extends StatelessWidget {
   final bool dragEnabled;
   final bool swipeEnabled;
   final ConfigDragPayload? activeDragPayload;
-  static const double _actionExtent = 132;
+  static const double _actionExtent = 268;
 
   @override
   Widget build(BuildContext context) {

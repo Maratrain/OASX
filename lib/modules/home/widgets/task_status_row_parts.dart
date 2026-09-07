@@ -23,6 +23,7 @@ class _TaskMeta extends StatelessWidget {
       sourceConfig: sourceScriptName,
       taskName: task.name,
     );
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final title = Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -42,6 +43,36 @@ class _TaskMeta extends StatelessWidget {
         MistMiniTag(label: _tagLabel, color: stateColor),
       ],
     );
+    final subtitle = Container(
+      margin: const EdgeInsets.only(top: 3),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            I18n.nextRun.tr,
+            style: TextStyle(
+              fontSize: 11,
+              color: isDark ? const Color(0xFF8A93AB) : const Color(0xFF9AA3B8),
+            ),
+          ),
+          const SizedBox(width: 4),
+          DateTimePicker(
+            value: task.timeText,
+            notHoverStyle: TextStyle(
+              fontSize: 11,
+              fontFamily: 'Cascadia Code',
+              color: isDark ? const Color(0xFFB8C0D4) : const Color(0xFF5A6378),
+            ),
+            hoverStyle: TextStyle(
+              fontSize: 11,
+              fontFamily: 'Cascadia Code',
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            onChange: (value) => unawaited(onSetNextRun(task.name, value)),
+          ),
+        ],
+      ),
+    );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.center,
@@ -57,23 +88,7 @@ class _TaskMeta extends StatelessWidget {
                 child: title,
               )
             : title,
-        if (task.timeText.isNotEmpty) ...[
-          const SizedBox(height: 3),
-          DateTimePicker(
-            value: task.timeText,
-            notHoverStyle: TextStyle(
-              fontSize: 11,
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? const Color(0xFFB8C0D4)
-                  : const Color(0xFF5A6378),
-            ),
-            hoverStyle: TextStyle(
-              fontSize: 11,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-            onChange: (value) => unawaited(onSetNextRun(task.name, value)),
-          ),
-        ],
+        if (task.timeText.isNotEmpty) subtitle,
       ],
     );
   }
@@ -81,8 +96,8 @@ class _TaskMeta extends StatelessWidget {
   String get _tagLabel {
     return switch (task.type) {
       TaskStatusType.running => I18n.mistStateRunning.tr.toUpperCase(),
-      TaskStatusType.pending => I18n.mistStateWaiting.tr.toUpperCase(),
-      TaskStatusType.waiting => I18n.mistStateWaiting.tr.toUpperCase(),
+      TaskStatusType.pending || TaskStatusType.waiting =>
+        I18n.mistStateWaiting.tr.toUpperCase(),
     };
   }
 }
@@ -130,22 +145,23 @@ class _TaskActionBar extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        _TaskActionIcon(
-          icon: Icons.flash_on_rounded,
-          tooltip: I18n.homeQuickRun.tr,
-          highlight: true,
-          onPressed: onQuickRun,
-        ),
-        const SizedBox(width: 4),
-        _TaskActionIcon(
+        if (onQuickRun != null)
+          _MiniPillButton(
+            icon: Icons.flash_on_rounded,
+            label: I18n.homeQuickRun.tr,
+            primary: true,
+            onPressed: onQuickRun,
+          ),
+        if (onQuickRun != null) const SizedBox(width: 6),
+        _MiniPillButton(
           icon: Icons.schedule_rounded,
-          tooltip: I18n.homeQuickWait.tr,
+          label: I18n.homeQuickWait.tr,
           onPressed: onQuickWait,
         ),
-        const SizedBox(width: 4),
-        _TaskActionIcon(
+        const SizedBox(width: 6),
+        _MiniPillButton(
           icon: Icons.tune_rounded,
-          tooltip: I18n.homeOpenTaskParams.tr,
+          label: I18n.homeOpenTaskParams.tr,
           onPressed: onEditTask,
         ),
       ],
@@ -153,28 +169,27 @@ class _TaskActionBar extends StatelessWidget {
   }
 }
 
-class _TaskActionIcon extends StatelessWidget {
-  const _TaskActionIcon({
+/// 「图标+文字」小胶囊按钮（设计稿 .mini / .mini.pri 样式）。
+class _MiniPillButton extends StatelessWidget {
+  const _MiniPillButton({
     required this.icon,
-    required this.tooltip,
+    required this.label,
     required this.onPressed,
-    this.highlight = false,
+    this.primary = false,
   });
 
   final IconData icon;
-  final String tooltip;
+  final String label;
   final VoidCallback? onPressed;
-
-  /// 主操作按钮：靛紫渐变底白图标（设计稿「立即运行」）。
-  final bool highlight;
+  final bool primary;
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final Widget content = Container(
-      width: 28,
       height: 26,
-      decoration: highlight
+      padding: const EdgeInsets.symmetric(horizontal: 11),
+      decoration: primary
           ? MistDecor.accentCapsule(radius: 8)
           : BoxDecoration(
               color:
@@ -186,21 +201,37 @@ class _TaskActionIcon extends StatelessWidget {
                     : const Color(0x171E283A),
               ),
             ),
-      child: Icon(
-        icon,
-        size: 14,
-        color: highlight
-            ? Colors.white
-            : (isDark ? const Color(0xFFB8C0D4) : const Color(0xFF5A6378)),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            size: 11.5,
+            color: primary
+                ? Colors.white
+                : (isDark
+                    ? const Color(0xFFB8C0D4)
+                    : const Color(0xFF5A6378)),
+          ),
+          const SizedBox(width: 5),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 11,
+              color: primary
+                  ? Colors.white
+                  : (isDark
+                      ? const Color(0xFFB8C0D4)
+                      : const Color(0xFF5A6378)),
+            ),
+          ),
+        ],
       ),
     );
-    return IconButton(
-      tooltip: tooltip,
-      padding: EdgeInsets.zero,
-      visualDensity: VisualDensity.compact,
-      constraints: const BoxConstraints.tightFor(width: 34, height: 32),
-      onPressed: onPressed,
-      icon: content,
+    return InkWell(
+      onTap: onPressed,
+      borderRadius: BorderRadius.circular(8),
+      child: content,
     );
   }
 }

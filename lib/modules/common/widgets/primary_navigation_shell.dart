@@ -8,6 +8,7 @@ import 'package:oasx/modules/home/index.dart';
 import 'package:oasx/modules/home/models/home_workbench_layout.dart';
 import 'package:oasx/modules/settings/index.dart';
 import 'package:oasx/translation/i18n_content.dart';
+import 'package:oasx/utils/check_version.dart';
 
 const double kPrimaryNavigationRailWidth = 76;
 
@@ -218,6 +219,17 @@ class _PrimaryNavigationRail extends StatelessWidget {
             isDark: isDark,
             onTap: () => onSelected(1),
           ),
+          const Spacer(),
+          _RailItem(
+            icon: Icons.refresh_rounded,
+            label: I18n.mistUpdate.tr,
+            selected: false,
+            isDark: isDark,
+            onTap: () => unawaited(
+              checkUpdate(showTip: true),
+            ),
+          ),
+          const SizedBox(height: 2),
         ],
       ),
     );

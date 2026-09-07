@@ -54,7 +54,7 @@ class ActiveConfigPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: EdgeInsets.zero,
         child: Obx(() {
           final script = controller.activeScriptModel;
           final currentTab = controller.displayedWorkbenchTabFor(layoutMode);
@@ -71,67 +71,100 @@ class ActiveConfigPanel extends StatelessWidget {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  if (onBackToScripts != null)
-                    IconButton(
-                      tooltip: I18n.scriptList.tr,
-                      onPressed: onBackToScripts,
-                      icon: const Icon(Icons.arrow_back_rounded),
-                    ),
-                  Expanded(
-                    child: Text(
-                      script.name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w700,
+              // ── whead：标题 + 状态胶囊 + ghost 批量按钮 + 电源小图标 ──
+              Padding(
+                padding: const EdgeInsets.fromLTRB(18, 14, 12, 11),
+                child: Row(
+                  children: [
+                    if (onBackToScripts != null)
+                      IconButton(
+                        tooltip: I18n.scriptList.tr,
+                        onPressed: onBackToScripts,
+                        icon: const Icon(Icons.arrow_back_rounded),
+                      ),
+                    Expanded(
+                      child: Text(
+                        script.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ),
-                  ),
-                  MistStatusPill(
-                    label: _scriptStateLabel(controller, script),
-                    color: _scriptStateColor(controller, script),
-                  ),
-                  const SizedBox(width: 8),
-                  _PowerGhostButton(
-                    isRunning: isRunning,
-                    onPressed: () => onTogglePower(script.name, !isRunning),
-                  ),
-                  if (onExpandRightSidebar != null) ...[
+                    MistStatusPill(
+                      label: _scriptStateLabel(controller, script),
+                      color: _scriptStateColor(controller, script),
+                    ),
+                    const Spacer(),
+                    MistGhostButton(
+                      icon: Icons.flash_on_rounded,
+                      label: I18n.homeQuickRunAll.tr,
+                      foreground: const Color(0xFFB26A00),
+                      background: const Color(0xFFFFF4DE),
+                      borderColor: const Color(0xFFF5DFB2),
+                      loading: bulkMode == HomeBulkQuickScheduleMode.runNow,
+                      onPressed:
+                          isBulkIdle && hasBulkTasks ? onBulkQuickRun : null,
+                    ),
                     const SizedBox(width: 8),
-                    IconButton(
-                      key: const ValueKey<String>(
-                        'home-workbench-expand-right-sidebar',
-                      ),
-                      tooltip: I18n.homeRestoreSidebar.tr,
-                      onPressed: onExpandRightSidebar,
-                      icon: const Icon(
-                        Icons.keyboard_double_arrow_left_rounded,
-                      ),
+                    MistGhostButton(
+                      icon: Icons.schedule_rounded,
+                      label: I18n.homeQuickWaitAll.tr,
+                      foreground: const Color(0xFF0B7A4B),
+                      background: const Color(0xFFE2F7EC),
+                      borderColor: const Color(0xFFC2E9D4),
+                      loading: bulkMode == HomeBulkQuickScheduleMode.waitNow,
+                      onPressed:
+                          isBulkIdle && hasBulkTasks ? onBulkQuickWait : null,
                     ),
+                    const SizedBox(width: 8),
+                    _PowerIconButton(
+                      isRunning: isRunning,
+                      onPressed: () => onTogglePower(script.name, !isRunning),
+                    ),
+                    if (onExpandRightSidebar != null) ...[
+                      const SizedBox(width: 8),
+                      IconButton(
+                        key: const ValueKey<String>(
+                          'home-workbench-expand-right-sidebar',
+                        ),
+                        tooltip: I18n.homeRestoreSidebar.tr,
+                        onPressed: onExpandRightSidebar,
+                        icon: const Icon(
+                          Icons.keyboard_double_arrow_left_rounded,
+                        ),
+                      ),
+                    ],
                   ],
-                ],
+                ),
               ),
-              const SizedBox(height: 6),
-              MistUnderlineTabs<HomeWorkbenchTab>(
-                tabs: [
-                  for (final tab in tabs) (tab, _tabLabel(tab)),
-                ],
-                selected: currentTab,
-                onSelected: onChangeTab,
+              // ── tabs：下划线式 + 底部 hairline ──
+              Container(
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(
+                      color: Theme.of(context).dividerColor,
+                    ),
+                  ),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 18),
+                child: MistUnderlineTabs<HomeWorkbenchTab>(
+                  tabs: [
+                    for (final tab in tabs) (tab, _tabLabel(tab)),
+                  ],
+                  selected: currentTab,
+                  onSelected: onChangeTab,
+                ),
               ),
-              const SizedBox(height: 10),
-              _BulkActionBar(
-                bulkMode: bulkMode,
-                hasBulkTasks: hasBulkTasks,
-                isBulkIdle: isBulkIdle,
-                onBulkQuickRun: onBulkQuickRun,
-                onBulkQuickWait: onBulkQuickWait,
+              const SizedBox(height: 14),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(18, 0, 18, 14),
+                  child: _buildTabContent(script, currentTab),
+                ),
               ),
-              const SizedBox(height: 10),
-              Expanded(child: _buildTabContent(script, currentTab)),
             ],
           );
         }),
@@ -177,79 +210,41 @@ class ActiveConfigPanel extends StatelessWidget {
   }
 }
 
-/// 脚本电源 ghost 按钮（运行中=琥珀停止 / 停止=绿色启动）。
-class _PowerGhostButton extends StatelessWidget {
-  const _PowerGhostButton({required this.isRunning, required this.onPressed});
+/// 头部右侧电源小图标按钮（设计稿 ibtn 样式）。
+class _PowerIconButton extends StatelessWidget {
+  const _PowerIconButton({required this.isRunning, required this.onPressed});
 
   final bool isRunning;
   final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
-    if (isRunning) {
-      return MistGhostButton(
-        icon: Icons.power_settings_new_rounded,
-        label: I18n.stop.tr,
-        foreground: const Color(0xFFB26A00),
-        background: const Color(0xFFFFF4DE),
-        borderColor: const Color(0xFFF5DFB2),
-        onPressed: onPressed,
-      );
-    }
-    return MistGhostButton(
-      icon: Icons.power_settings_new_rounded,
-      label: I18n.run.tr,
-      foreground: const Color(0xFF0B7A4B),
-      background: const Color(0xFFE2F7EC),
-      borderColor: const Color(0xFFC2E9D4),
-      onPressed: onPressed,
-    );
-  }
-}
-
-/// 「全部立即运行 / 全部等待」批量操作条（ghost 按钮对）。
-class _BulkActionBar extends StatelessWidget {
-  const _BulkActionBar({
-    required this.bulkMode,
-    required this.hasBulkTasks,
-    required this.isBulkIdle,
-    required this.onBulkQuickRun,
-    required this.onBulkQuickWait,
-  });
-
-  final HomeBulkQuickScheduleMode bulkMode;
-  final bool hasBulkTasks;
-  final bool isBulkIdle;
-  final Future<void> Function() onBulkQuickRun;
-  final Future<void> Function() onBulkQuickWait;
-
-  @override
-  Widget build(BuildContext context) {
-    if (!hasBulkTasks) {
-      return const SizedBox.shrink();
-    }
-    return Row(
-      children: [
-        MistGhostButton(
-          icon: Icons.flash_on_rounded,
-          label: I18n.homeQuickRunAll.tr,
-          foreground: const Color(0xFFB26A00),
-          background: const Color(0xFFFFF4DE),
-          borderColor: const Color(0xFFF5DFB2),
-          loading: bulkMode == HomeBulkQuickScheduleMode.runNow,
-          onPressed: isBulkIdle ? onBulkQuickRun : null,
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Tooltip(
+      message: isRunning ? I18n.stop.tr : I18n.run.tr,
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          width: 28,
+          height: 28,
+          decoration: BoxDecoration(
+            color:
+                isDark ? const Color(0x14FFFFFF) : const Color(0xA6FFFFFF),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: isDark
+                  ? const Color(0x1FFFFFFF)
+                  : const Color(0x171E283A),
+            ),
+          ),
+          child: Icon(
+            Icons.power_settings_new_rounded,
+            size: 15,
+            color: isDark ? const Color(0xFFB8C0D4) : const Color(0xFF5A6378),
+          ),
         ),
-        const SizedBox(width: 8),
-        MistGhostButton(
-          icon: Icons.schedule_rounded,
-          label: I18n.homeQuickWaitAll.tr,
-          foreground: const Color(0xFF0B7A4B),
-          background: const Color(0xFFE2F7EC),
-          borderColor: const Color(0xFFC2E9D4),
-          loading: bulkMode == HomeBulkQuickScheduleMode.waitNow,
-          onPressed: isBulkIdle ? onBulkQuickWait : null,
-        ),
-      ],
+      ),
     );
   }
 }
