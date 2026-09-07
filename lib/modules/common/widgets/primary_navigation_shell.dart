@@ -9,7 +9,7 @@ import 'package:oasx/modules/home/models/home_workbench_layout.dart';
 import 'package:oasx/modules/settings/index.dart';
 import 'package:oasx/translation/i18n_content.dart';
 
-const double kPrimaryNavigationRailWidth = 80;
+const double kPrimaryNavigationRailWidth = 76;
 
 class PrimaryNavigationShell extends StatefulWidget {
   const PrimaryNavigationShell({
@@ -65,11 +65,13 @@ class _PrimaryNavigationShellState extends State<PrimaryNavigationShell> {
             body: showRail
                 ? Row(
                     children: [
-                      _PrimaryNavigationRail(
-                        selectedIndex: selectedIndex,
-                        onSelected: _handleDestinationSelected,
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(10, 10, 0, 12),
+                        child: _PrimaryNavigationRail(
+                          selectedIndex: selectedIndex,
+                          onSelected: _handleDestinationSelected,
+                        ),
                       ),
-                      const VerticalDivider(width: 1),
                       Expanded(child: content),
                     ],
                   )
@@ -165,6 +167,7 @@ class _PrimaryNavigationContent extends StatelessWidget {
   }
 }
 
+/// 设计稿 B 的窄浮动玻璃导航卡：竖排图标+文字，选中为靛紫渐变胶囊。
 class _PrimaryNavigationRail extends StatelessWidget {
   const _PrimaryNavigationRail({
     required this.selectedIndex,
@@ -176,20 +179,100 @@ class _PrimaryNavigationRail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return NavigationRail(
-      selectedIndex: selectedIndex,
-      onDestinationSelected: onSelected,
-      labelType: NavigationRailLabelType.all,
-      destinations: [
-        NavigationRailDestination(
-          icon: const Icon(Icons.home_rounded),
-          label: Text(I18n.home.tr),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      width: 58,
+      decoration: BoxDecoration(
+        color: isDark ? MistPalette.darkGlass : MistPalette.lightGlass,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: isDark
+              ? MistPalette.darkGlassBorder
+              : MistPalette.lightGlassBorder,
         ),
-        NavigationRailDestination(
-          icon: const Icon(Icons.settings_rounded),
-          label: Text(I18n.setting.tr),
+        boxShadow: isDark
+            ? null
+            : const [
+                BoxShadow(
+                  color: Color(0x213C5064),
+                  blurRadius: 34,
+                  offset: Offset(0, 10),
+                ),
+              ],
+      ),
+      child: Column(
+        children: [
+          const SizedBox(height: 10),
+          _RailItem(
+            icon: Icons.home_rounded,
+            label: I18n.home.tr,
+            selected: selectedIndex == 0,
+            isDark: isDark,
+            onTap: () => onSelected(0),
+          ),
+          const SizedBox(height: 6),
+          _RailItem(
+            icon: Icons.settings_rounded,
+            label: I18n.setting.tr,
+            selected: selectedIndex == 1,
+            isDark: isDark,
+            onTap: () => onSelected(1),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RailItem extends StatelessWidget {
+  const _RailItem({
+    required this.icon,
+    required this.label,
+    required this.selected,
+    required this.isDark,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final bool selected;
+  final bool isDark;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = selected
+        ? Colors.white
+        : (isDark ? const Color(0xFF8A93AB) : const Color(0xFF9AA3B8));
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 6),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(13),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          curve: Curves.easeOut,
+          height: 50,
+          decoration: selected
+              ? MistDecor.accentCapsule(radius: 13)
+              : BoxDecoration(borderRadius: BorderRadius.circular(13)),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 19, color: color),
+              const SizedBox(height: 3),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 10,
+                  color: color,
+                  fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+                ),
+              ),
+            ],
+          ),
         ),
-      ],
+      ),
     );
   }
 }

@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:oasx/modules/common/models/config_drag_payload.dart';
+import 'package:oasx/config/theme.dart';
+import 'package:oasx/modules/common/widgets/mist_glass.dart';
 import 'package:oasx/modules/home/controllers/dashboard_controller.dart';
 import 'package:oasx/modules/home/models/config_model.dart';
 import 'package:oasx/modules/home/widgets/config_collection_tile.dart';
@@ -10,7 +12,6 @@ import 'package:oasx/translation/i18n_content.dart';
 
 class ConfigCollectionPanel extends StatefulWidget {
   static const _compactHeaderThreshold = 220.0;
-  static const _compactFilterThreshold = 150.0;
   static const _visibleStateFilters = [
     HomeScriptStateFilter.all,
     HomeScriptStateFilter.running,
@@ -52,9 +53,6 @@ class ConfigCollectionPanel extends StatefulWidget {
 class _ConfigCollectionPanelState extends State<ConfigCollectionPanel> {
   static const _autoScrollEdgeExtent = 56.0;
   static const _autoScrollStep = 10.0;
-
-  /// Tracks whether the compact filter row should show the search field.
-  bool _showCompactSearch = false;
 
   /// Controller reused when the compact search field is visible.
   late final TextEditingController _searchController;
@@ -107,10 +105,8 @@ class _ConfigCollectionPanelState extends State<ConfigCollectionPanel> {
               child: ListView.separated(
                 controller: _listScrollController,
                 itemCount: scripts.length,
-                separatorBuilder: (_, __) => Divider(
-                  height: 1,
-                  color: Theme.of(context).colorScheme.outlineVariant,
-                ),
+                separatorBuilder: (_, __) => const SizedBox(height: 7),
+                padding: const EdgeInsets.only(bottom: 4),
                 itemBuilder: (context, index) =>
                     _buildDropTargetTile(context, scripts[index]),
               ),
@@ -121,7 +117,9 @@ class _ConfigCollectionPanelState extends State<ConfigCollectionPanel> {
             children: [
               _buildHeader(context),
               const SizedBox(height: 10),
-              _buildFilters(context),
+              _buildSearchField(context),
+              const SizedBox(height: 9),
+              _buildFilterChips(context),
               const SizedBox(height: 10),
               ExpandedOrSizedBox(
                 fillHeight: widget.fillHeight,
@@ -163,14 +161,13 @@ class _ConfigCollectionPanelState extends State<ConfigCollectionPanel> {
         final isHighlighted = _canAcceptPayload(script.name, candidate);
         return AnimatedContainer(
           duration: const Duration(milliseconds: 160),
-          margin: const EdgeInsets.symmetric(vertical: 2),
           decoration: BoxDecoration(
             color: isHighlighted
                 ? Theme.of(
                     context,
                   ).colorScheme.primaryContainer.withValues(alpha: 0.28)
                 : Colors.transparent,
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: isHighlighted
                   ? Theme.of(context).colorScheme.primary
@@ -304,88 +301,77 @@ class _ConfigCollectionPanelState extends State<ConfigCollectionPanel> {
     );
   }
 
-  Widget _buildFilters(BuildContext context) {
-    final filter = widget.controller.stateFilter.value;
-    final isFiltered = filter != HomeScriptStateFilter.all;
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final compactFilters =
-            constraints.maxWidth <
-            ConfigCollectionPanel._compactFilterThreshold;
-        final filterButton = _FilterButton(
-          filter: filter,
-          isFiltered: isFiltered,
-          onSelected: widget.controller.setStateFilterValue,
-          stateLabel: _stateLabel,
-        );
-        if (!compactFilters) {
-          _showCompactSearch = false;
-          return Row(
-            children: [
-              Expanded(
-                child: _SearchField(
-                  controller: _searchController,
-                  onChanged: widget.controller.setSearchQuery,
-                ),
-              ),
-              const SizedBox(width: 8),
-              filterButton,
-            ],
-          );
-        }
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            if (_showCompactSearch) ...[
-              Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 280),
-                  child: _SearchField(
-                    controller: _searchController,
-                    onChanged: widget.controller.setSearchQuery,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
-            ],
-            Center(
-              child: IntrinsicWidth(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      tooltip: I18n.homeScriptSearchHint.tr,
-                      onPressed: _toggleCompactSearch,
-                      constraints: const BoxConstraints.tightFor(
-                        width: 40,
-                        height: 40,
-                      ),
-                      icon: Icon(
-                        _showCompactSearch
-                            ? Icons.search_off_rounded
-                            : Icons.search_rounded,
-                      ),
-                    ),
-                    filterButton,
-                  ],
-                ),
-              ),
-            ),
-          ],
-        );
-      },
+  /// 圆角玻璃搜索框（设计稿 B 左栏样式）。
+  Widget _buildSearchField(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return TextFormField(
+      controller: _searchController,
+      decoration: InputDecoration(
+        prefixIcon: Icon(
+          Icons.search_rounded,
+          size: 18,
+          color: isDark ? const Color(0xFF8A93AB) : const Color(0xFF9AA3B8),
+        ),
+        prefixIconConstraints: const BoxConstraints(minWidth: 34),
+        hintText: I18n.homeScriptSearchHint.tr,
+        hintStyle: TextStyle(
+          fontSize: 11.5,
+          color: isDark ? const Color(0xFF8A93AB) : const Color(0xFF9AA3B8),
+        ),
+        filled: true,
+        fillColor: isDark ? const Color(0x14FFFFFF) : const Color(0xB3FFFFFF),
+        isDense: true,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        constraints: const BoxConstraints(minHeight: 31),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(
+            color: isDark
+                ? const Color(0x1FFFFFFF)
+                : const Color(0x171E283A),
+          ),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(
+            color: isDark
+                ? const Color(0x1FFFFFFF)
+                : const Color(0x171E283A),
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: MistPalette.accent),
+        ),
+      ),
+      style: const TextStyle(fontSize: 12),
+      onChanged: widget.controller.setSearchQuery,
     );
   }
 
-  /// Toggles the compact search field shown above the filter buttons.
-  void _toggleCompactSearch() {
-    if (!mounted) {
-      return;
-    }
-    setState(() {
-      _showCompactSearch = !_showCompactSearch;
-    });
+  /// 状态筛选胶囊行：全部 / 运行中 / 已停止 / 异常（带计数）。
+  Widget _buildFilterChips(BuildContext context) {
+    final controller = widget.controller;
+    return Wrap(
+      spacing: 6,
+      runSpacing: 6,
+      children: [
+        for (final value in ConfigCollectionPanel._visibleStateFilters)
+          MistPillChip(
+            label: _stateLabel(value),
+            count: '${_filterCount(value)}',
+            selected: controller.stateFilter.value == value,
+            onTap: () => controller.setStateFilterValue(value),
+          ),
+      ],
+    );
+  }
+
+  int _filterCount(HomeScriptStateFilter value) {
+    return switch (value) {
+      HomeScriptStateFilter.all => widget.controller.orderedScripts.length,
+      _ => widget.controller.countScriptsByState(value),
+    };
   }
 
   String _stateLabel(HomeScriptStateFilter value) {
@@ -527,66 +513,6 @@ class _HeaderActions extends StatelessWidget {
               : const Icon(Icons.add_rounded),
         ),
       ],
-    );
-  }
-}
-
-class _SearchField extends StatelessWidget {
-  const _SearchField({required this.controller, required this.onChanged});
-
-  final TextEditingController controller;
-  final ValueChanged<String> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return TextFormField(
-      controller: controller,
-      decoration: InputDecoration(
-        prefixIcon: const Icon(Icons.search_rounded),
-        hintText: I18n.homeScriptSearchHint.tr,
-        border: const OutlineInputBorder(),
-        isDense: true,
-      ),
-      onChanged: onChanged,
-    );
-  }
-}
-
-class _FilterButton extends StatelessWidget {
-  const _FilterButton({
-    required this.filter,
-    required this.isFiltered,
-    required this.onSelected,
-    required this.stateLabel,
-  });
-
-  final HomeScriptStateFilter filter;
-  final bool isFiltered;
-  final ValueChanged<HomeScriptStateFilter> onSelected;
-  final String Function(HomeScriptStateFilter value) stateLabel;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox.square(
-      dimension: 40,
-      child: PopupMenuButton<HomeScriptStateFilter>(
-        padding: EdgeInsets.zero,
-        tooltip: stateLabel(filter),
-        initialValue: filter,
-        onSelected: onSelected,
-        itemBuilder: (context) => ConfigCollectionPanel._visibleStateFilters
-            .map(
-              (value) => PopupMenuItem<HomeScriptStateFilter>(
-                value: value,
-                child: Text(stateLabel(value)),
-              ),
-            )
-            .toList(),
-        icon: Icon(
-          Icons.filter_list_rounded,
-          color: isFiltered ? Theme.of(context).colorScheme.primary : null,
-        ),
-      ),
     );
   }
 }

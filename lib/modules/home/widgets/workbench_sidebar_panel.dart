@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:oasx/modules/common/widgets/mist_glass.dart';
 import 'package:oasx/modules/home/controllers/dashboard_controller.dart';
 import 'package:oasx/modules/home/models/home_workbench_layout.dart';
 import 'package:oasx/modules/home/widgets/log_center_panel.dart';
@@ -38,15 +39,15 @@ class WorkbenchSidebarPanel extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Wrap(
-                spacing: 8,
-                runSpacing: 8,
+                spacing: 6,
+                runSpacing: 6,
                 children: tabs
                     .map(
-                      (tab) => ChoiceChip(
-                        label: Text(_tabLabel(tab)),
-                        showCheckmark: false,
+                      (tab) => MistPillChip(
+                        label: _tabLabel(tab),
                         selected: currentTab == tab,
-                        onSelected: (_) =>
+                        compact: true,
+                        onTap: () =>
                             controller.setActiveWorkbenchSidebarTabValue(tab),
                       ),
                     )

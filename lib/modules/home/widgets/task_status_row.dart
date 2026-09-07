@@ -2,9 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:oasx/config/theme.dart';
 import 'package:oasx/modules/args/index.dart';
 import 'package:oasx/modules/common/models/config_drag_payload.dart';
 import 'package:oasx/modules/common/widgets/drag_copy_feedback.dart';
+import 'package:oasx/modules/common/widgets/mist_glass.dart';
 import 'package:oasx/modules/home/controllers/dashboard_controller.dart';
 import 'package:oasx/modules/home/widgets/split_scroll_row.dart';
 import 'package:oasx/modules/home/widgets/task_status_swipe_container.dart';
@@ -31,6 +33,9 @@ class TaskStatusViewData {
 enum TaskStatusType { running, pending, waiting }
 
 /// Renders one swipe-to-disable task row for the overview tab.
+///
+/// 「晨雾玻璃」行样式：圆角白卡 + 状态左色条 + 着色图标容器 +
+/// 状态小徽标 + 右侧操作按钮组。
 class TaskStatusRow extends StatelessWidget {
   const TaskStatusRow({
     super.key,
@@ -68,85 +73,121 @@ class TaskStatusRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final rowBackground = _rowBackground(context);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final stateColor = _stateColor(context);
+    final rowColor = _rowColor(context, isDark);
     return TaskStatusSwipeContainer(
       enabled: swipeEnabled,
       onConfirmDismiss: () => onDisableTask(task.name),
       onDismissed: () => onDismissed(task.rowId),
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: _foregroundColor(context, rowBackground),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: _borderColor(context)),
+          color: rowColor,
+          borderRadius: BorderRadius.circular(13),
+          border: Border.all(color: _borderColor(context, isDark)),
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(10),
-          child: SplitScrollRow(
-            minHeight: 40,
-            trailingExtent: _actionExtent,
-            trailingBackgroundColor: rowBackground,
-            trailing: _TaskActionBar(
-              onQuickRun: !quickScheduleLocked && canQuickSchedule
-                  ? () => onQuickRun(task.name)
-                  : null,
-              onQuickWait: !quickScheduleLocked && canQuickSchedule
-                  ? () => onQuickWait(task.name)
-                  : null,
-              onEditTask: () => onEditTask(task.name),
-            ),
-            leading: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _TaskTypeIcon(type: task.type),
-                const SizedBox(width: 10),
-                _TaskMeta(
-                  controller: controller,
-                  sourceScriptName: sourceScriptName,
-                  task: task,
-                  onSetNextRun: onSetNextRun,
-                  dragEnabled: dragEnabled,
+        child: Stack(
+          children: [
+            Positioned(
+              left: 0,
+              top: 10,
+              bottom: 10,
+              child: Container(
+                width: 3,
+                decoration: BoxDecoration(
+                  color: stateColor,
+                  borderRadius: BorderRadius.circular(3),
                 ),
-              ],
+              ),
             ),
-          ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(14, 11, 10, 11),
+              child: SplitScrollRow(
+                minHeight: 40,
+                trailingExtent: _actionExtent,
+                trailingBackgroundColor: rowColor,
+                trailing: _TaskActionBar(
+                  stateColor: stateColor,
+                  onQuickRun: !quickScheduleLocked && canQuickSchedule
+                      ? () => onQuickRun(task.name)
+                      : null,
+                  onQuickWait: !quickScheduleLocked && canQuickSchedule
+                      ? () => onQuickWait(task.name)
+                      : null,
+                  onEditTask: () => onEditTask(task.name),
+                ),
+                leading: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _TaskTypeIcon(type: task.type, stateColor: stateColor),
+                    const SizedBox(width: 11),
+                    _TaskMeta(
+                      controller: controller,
+                      sourceScriptName: sourceScriptName,
+                      task: task,
+                      stateColor: stateColor,
+                      onSetNextRun: onSetNextRun,
+                      dragEnabled: dragEnabled,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  /// Resolves the row background by task bucket.
-  Color _rowBackground(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
+  Color _stateColor(BuildContext context) {
     return switch (task.type) {
-      TaskStatusType.running => scheme.tertiaryContainer.withValues(
-        alpha: 0.24,
-      ),
-      TaskStatusType.pending => scheme.secondaryContainer.withValues(
-        alpha: 0.2,
-      ),
-      TaskStatusType.waiting => scheme.surfaceContainerHigh,
+      TaskStatusType.running => MistPalette.runGreen,
+      TaskStatusType.pending => MistPalette.warnOrange,
+      TaskStatusType.waiting => const Color(0xFF7C8DB5),
     };
   }
 
-  /// Resolves the highlighted foreground color during drag-copy sessions.
-  Color _foregroundColor(BuildContext context, Color fallback) {
+  /// Resolves the row background: bucket tint merged with drag highlight.
+  Color _rowColor(BuildContext context, bool isDark) {
+    final scheme = Theme.of(context).colorScheme;
+    final Color base;
+    if (isDark) {
+      base = switch (task.type) {
+        TaskStatusType.running => scheme.tertiaryContainer.withValues(
+          alpha: 0.16,
+        ),
+        TaskStatusType.pending => scheme.secondaryContainer.withValues(
+          alpha: 0.14,
+        ),
+        TaskStatusType.waiting => Theme.of(context).cardColor,
+      };
+    } else {
+      base = switch (task.type) {
+        TaskStatusType.running => const Color(0x8CFFFFFF),
+        TaskStatusType.pending => const Color(0x8CFFFFFF),
+        TaskStatusType.waiting => const Color(0x73FFFFFF),
+      };
+    }
     final isDraggingTask =
         activeDragPayload?.matchesTask(sourceScriptName, task.name) ?? false;
     if (!isDraggingTask) {
-      return fallback;
+      return base;
     }
-    return Theme.of(
-      context,
-    ).colorScheme.primaryContainer.withValues(alpha: 0.42);
+    return Color.alphaBlend(
+      scheme.primaryContainer.withValues(alpha: 0.42),
+      base,
+    );
   }
 
   /// Resolves the row border tint by task bucket.
-  Color _borderColor(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
+  Color _borderColor(BuildContext context, bool isDark) {
+    if (isDark) {
+      return MistPalette.darkGlassBorder;
+    }
     return switch (task.type) {
-      TaskStatusType.running => Colors.green.withValues(alpha: 0.28),
-      TaskStatusType.pending => Colors.orange.withValues(alpha: 0.3),
-      TaskStatusType.waiting => scheme.outlineVariant.withValues(alpha: 0.7),
+      TaskStatusType.running => MistPalette.runGreen.withValues(alpha: 0.28),
+      TaskStatusType.pending => MistPalette.warnOrange.withValues(alpha: 0.30),
+      TaskStatusType.waiting => const Color(0x14FFFFFF),
     };
   }
 }

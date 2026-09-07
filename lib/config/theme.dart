@@ -62,19 +62,31 @@ abstract final class MistPalette {
   static const darkRailGlass = Color(0x0DFFFFFF); // 白 5%
 
   /// 渐变光斑（页面四角的柔色晕染）。
-  static const lightGlowViolet = Color(0x247C5BFA);
-  static const lightGlowBlue = Color(0x243898FF);
-  static const lightGlowGreen = Color(0x1412B26B);
-  static const darkGlowViolet = Color(0x2E7C5BFA);
-  static const darkGlowBlue = Color(0x263898FF);
-  static const darkGlowGreen = Color(0x1A18B26B);
+  static const lightGlowViolet = Color(0x4D7C5BFA);
+  static const lightGlowBlue = Color(0x523898FF);
+  static const lightGlowGreen = Color(0x2E12B26B);
+  static const darkGlowViolet = Color(0x4D7C5BFA);
+  static const darkGlowBlue = Color(0x453898FF);
+  static const darkGlowGreen = Color(0x2E18B26B);
 
   /// 分隔线。
   static const lightHairline = Color(0x171E283A);
   static const darkHairline = Color(0x1FFFFFFF);
+
+  /// 设计稿 B「晨雾玻璃」的功能色。
+  static const accent = Color(0xFF5B7CFA);
+  static const accent2 = Color(0xFF7C5BFA);
+  static const accentGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [accent, accent2],
+  );
+  static const runGreen = Color(0xFF18B26B);
+  static const warnOrange = Color(0xFFE8930C);
+  static const stopGrey = Color(0xFF9AA3B8);
 }
 
-/// 晨雾渐变页面背景：底色 + 三个柔色光斑，亮暗模式各自取色。
+/// 晨雾渐变页面背景：雾蓝→淡紫底色 + 角部柔色光斑，亮暗模式各自取色。
 class MistBackground extends StatelessWidget {
   const MistBackground({super.key, required this.child});
 
@@ -87,48 +99,97 @@ class MistBackground extends StatelessWidget {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          ColoredBox(
-            color: isDark ? MistPalette.darkBase : MistPalette.lightBase,
-          ),
           DecoratedBox(
             decoration: BoxDecoration(
-              gradient: RadialGradient(
-                center: const Alignment(0.9, -1.15),
-                radius: 0.9,
-                colors: [
-                  isDark ? MistPalette.darkGlowViolet : MistPalette.lightGlowViolet,
-                  Colors.transparent,
-                ],
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: isDark
+                    ? const [MistPalette.darkBase, Color(0xFF161A28)]
+                    : const [MistPalette.lightBase, Color(0xFFF6F4FF)],
               ),
             ),
           ),
-          DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: RadialGradient(
-                center: const Alignment(-1.05, 1.1),
-                radius: 1.0,
-                colors: [
-                  isDark ? MistPalette.darkGlowBlue : MistPalette.lightGlowBlue,
-                  Colors.transparent,
-                ],
-              ),
-            ),
+          _buildGlow(
+            color: isDark
+                ? MistPalette.darkGlowViolet
+                : MistPalette.lightGlowViolet,
+            center: const Alignment(0.82, -1.05),
+            radius: 0.62,
           ),
-          DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: RadialGradient(
-                center: const Alignment(0.45, 1.3),
-                radius: 0.8,
-                colors: [
-                  isDark ? MistPalette.darkGlowGreen : MistPalette.lightGlowGreen,
-                  Colors.transparent,
-                ],
-              ),
-            ),
+          _buildGlow(
+            color: isDark
+                ? MistPalette.darkGlowBlue
+                : MistPalette.lightGlowBlue,
+            center: const Alignment(-0.95, 1.0),
+            radius: 0.66,
+          ),
+          _buildGlow(
+            color: isDark
+                ? MistPalette.darkGlowGreen
+                : MistPalette.lightGlowGreen,
+            center: const Alignment(0.35, 1.18),
+            radius: 0.52,
           ),
           child,
         ],
       ),
+    );
+  }
+
+  Widget _buildGlow({
+    required Color color,
+    required Alignment center,
+    required double radius,
+  }) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: RadialGradient(
+          center: center,
+          radius: radius,
+          colors: [color, color.withValues(alpha: 0)],
+        ),
+      ),
+    );
+  }
+}
+
+/// 晨雾玻璃共享装饰：玻璃面板 / 胶囊按钮 / 渐变胶囊。
+abstract final class MistDecor {
+  /// 圆角玻璃面板（卡片内容面）。
+  static BoxDecoration glass({double radius = 16, bool isDark = false}) {
+    return BoxDecoration(
+      color: isDark ? MistPalette.darkGlass : MistPalette.lightGlass,
+      borderRadius: BorderRadius.circular(radius),
+      border: Border.all(
+        color: isDark
+            ? MistPalette.darkGlassBorder
+            : MistPalette.lightGlassBorder,
+      ),
+      boxShadow: isDark
+          ? null
+          : const [
+              BoxShadow(
+                color: Color(0x213C5064),
+                blurRadius: 34,
+                offset: Offset(0, 10),
+              ),
+            ],
+    );
+  }
+
+  /// 靛紫渐变强调胶囊（导航选中 / 主按钮）。
+  static BoxDecoration accentCapsule({double radius = 999}) {
+    return BoxDecoration(
+      gradient: MistPalette.accentGradient,
+      borderRadius: BorderRadius.circular(radius),
+      boxShadow: const [
+        BoxShadow(
+          color: Color(0x6B5B7CFA),
+          blurRadius: 12,
+          offset: Offset(0, 4),
+        ),
+      ],
     );
   }
 }
@@ -152,11 +213,11 @@ ThemeData lightTheme = ThemeData(
     space: 1,
   ),
   cardTheme: CardThemeData(
-    elevation: 0,
+    elevation: 3,
     margin: EdgeInsets.zero,
     color: MistPalette.lightGlass,
     surfaceTintColor: Colors.transparent,
-    shadowColor: Colors.transparent,
+    shadowColor: const Color(0x3C3C5064),
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(16),
       side: const BorderSide(color: MistPalette.lightGlassBorder),
@@ -168,7 +229,7 @@ ThemeData lightTheme = ThemeData(
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
   ),
   navigationRailTheme: const NavigationRailThemeData(
-    backgroundColor: MistPalette.lightRailGlass,
+    backgroundColor: Colors.transparent,
     indicatorColor: Color(0xFFFFFFFF),
     elevation: 0,
   ),

@@ -169,6 +169,12 @@ class I18n {
       homeSortByName = 'home_sort_by_name',
       homeNoScriptSelected = 'home_no_script_selected',
       homeRestoreSidebar = 'home_restore_sidebar';
+  static const String mistConnected = 'mist_connected',
+      mistDisconnected = 'mist_disconnected';
+  static const String mistStateRunning = 'mist_state_running',
+      mistStateWaiting = 'mist_state_waiting',
+      mistStateStopped = 'mist_state_stopped',
+      mistStateAbnormal = 'mist_state_abnormal';
   static const String homeStatusTab = 'home_status_tab',
       homeTasksTab = 'home_tasks_tab',
       homeParamsTab = 'home_params_tab';

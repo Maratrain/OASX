@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:oasx/config/theme.dart';
 import 'package:oasx/modules/home/controllers/dashboard_controller.dart';
 import 'package:oasx/modules/home/models/config_model.dart';
 import 'package:oasx/modules/home/widgets/config_collection_script_label.dart';
@@ -18,8 +19,6 @@ class ConfigCollectionTile extends StatelessWidget {
     required this.onDelete,
   });
 
-  static const _actionSpacing = 8.0;
-  static const _compactLayoutThreshold = 200.0;
   final HomeDashboardController controller;
   final ScriptModel script;
   final VoidCallback onTap;
@@ -31,6 +30,7 @@ class ConfigCollectionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     return LayoutBuilder(
       builder: (context, constraints) {
         return Obx(() {
@@ -40,73 +40,114 @@ class ConfigCollectionTile extends StatelessWidget {
           final isDragCopyLoading = controller.isDragCopyPendingFor(
             script.name,
           );
-          final compactThreshold =
-              ConfigCollectionTile._compactLayoutThreshold +
-              (showLinkCheckbox ? 64 : 0);
-          final isCompact = constraints.maxWidth < compactThreshold;
-          final rowColor = isActive
-              ? theme.colorScheme.primaryContainer.withValues(alpha: 0.24)
-              : theme.cardColor;
           final accentColor = _accentColor(
             context,
             controller.scriptCollectionStateFor(script),
           );
-          return Material(
-            color: rowColor,
-            child: InkWell(
-              onTap: isDragCopyLoading ? null : onTap,
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: isCompact ? 8 : 10,
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    if (showLinkCheckbox) ...[
-                      SizedBox(
-                        width: 36,
-                        height: 36,
-                        child: Checkbox(
-                          value: isLinked,
-                          onChanged: (value) => controller.setScriptLinked(
-                            script.name,
-                            value ?? false,
-                          ),
-                          visualDensity: VisualDensity.compact,
-                        ),
+          return DecoratedBox(
+            decoration: BoxDecoration(
+              color: isActive
+                  ? (isDark
+                      ? theme.colorScheme.primaryContainer.withValues(
+                          alpha: 0.20,
+                        )
+                      : const Color(0xE6FFFFFF))
+                  : (isDark
+                      ? theme.cardColor
+                      : const Color(0x8CFFFFFF)),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isActive
+                    ? MistPalette.accent.withValues(alpha: 0.35)
+                    : Colors.transparent,
+              ),
+              boxShadow: isActive && !isDark
+                  ? const [
+                      BoxShadow(
+                        color: Color(0x295B7CFA),
+                        blurRadius: 18,
+                        offset: Offset(0, 6),
                       ),
-                      const SizedBox(width: 2),
-                    ],
-                    Expanded(
-                      child: Stack(
+                    ]
+                  : null,
+            ),
+            child: Stack(
+              children: [
+                if (isActive)
+                  Positioned(
+                    left: 0,
+                    top: 12,
+                    bottom: 12,
+                    child: Container(
+                      width: 3,
+                      decoration: BoxDecoration(
+                        gradient: MistPalette.accentGradient,
+                        borderRadius: BorderRadius.circular(3),
+                      ),
+                    ),
+                  ),
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: isDragCopyLoading ? null : onTap,
+                    borderRadius: BorderRadius.circular(12),
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(
+                        isActive ? 13 : 10,
+                        9,
+                        8,
+                        9,
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          AbsorbPointer(
-                            absorbing: isDragCopyLoading,
-                            child: _ScriptMeta(
-                              script: script,
-                              compact: isCompact,
-                              accentColor: accentColor,
-                              powerButton: _PowerButton(
-                                onTogglePower: onTogglePower,
+                          if (showLinkCheckbox) ...[
+                            SizedBox(
+                              width: 36,
+                              height: 36,
+                              child: Checkbox(
+                                value: isLinked,
+                                onChanged: (value) => controller
+                                    .setScriptLinked(
+                                  script.name,
+                                  value ?? false,
+                                ),
+                                visualDensity: VisualDensity.compact,
                               ),
-                              popupButton: _ActionMenuButton(
-                                onRename: onRename,
-                                onExport: onExport,
-                                onDelete: onDelete,
-                              ),
+                            ),
+                            const SizedBox(width: 2),
+                          ],
+                          Expanded(
+                            child: Stack(
+                              children: [
+                                AbsorbPointer(
+                                  absorbing: isDragCopyLoading,
+                                  child: _ScriptMeta(
+                                    script: script,
+                                    accentColor: accentColor,
+                                    powerButton: _PowerButton(
+                                      onTogglePower: onTogglePower,
+                                    ),
+                                    popupButton: _ActionMenuButton(
+                                      onRename: onRename,
+                                      onExport: onExport,
+                                      onDelete: onDelete,
+                                    ),
+                                  ),
+                                ),
+                                if (isDragCopyLoading)
+                                  const Positioned.fill(
+                                    child: _DragCopyLoadingMask(),
+                                  ),
+                              ],
                             ),
                           ),
-                          if (isDragCopyLoading)
-                            const Positioned.fill(
-                              child: _DragCopyLoadingMask(),
-                            ),
                         ],
                       ),
                     ),
-                  ],
+                  ),
                 ),
-              ),
+              ],
             ),
           );
         });
@@ -117,10 +158,10 @@ class ConfigCollectionTile extends StatelessWidget {
   Color _accentColor(BuildContext context, HomeScriptStateFilter value) {
     final scheme = Theme.of(context).colorScheme;
     return switch (value) {
-      HomeScriptStateFilter.running => Colors.green.shade600,
-      HomeScriptStateFilter.stopped => scheme.outline,
-      HomeScriptStateFilter.abnormal => Colors.orange.shade700,
-      HomeScriptStateFilter.offline => Colors.orange.shade700,
+      HomeScriptStateFilter.running => MistPalette.runGreen,
+      HomeScriptStateFilter.stopped => MistPalette.stopGrey,
+      HomeScriptStateFilter.abnormal => MistPalette.warnOrange,
+      HomeScriptStateFilter.offline => MistPalette.warnOrange,
       HomeScriptStateFilter.all => scheme.outline,
     };
   }
@@ -129,76 +170,48 @@ class ConfigCollectionTile extends StatelessWidget {
 class _ScriptMeta extends StatelessWidget {
   const _ScriptMeta({
     required this.script,
-    required this.compact,
     required this.accentColor,
     required this.powerButton,
     required this.popupButton,
   });
 
   final ScriptModel script;
-  final bool compact;
   final Color accentColor;
   final Widget powerButton;
   final Widget popupButton;
 
   @override
   Widget build(BuildContext context) {
-    if (compact) {
-      return IntrinsicHeight(
-        child: Row(
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            _RegularAccentBar(
-              key: ValueKey<String>('config-accent-bar-${script.name}'),
-              color: accentColor,
-            ),
-            const SizedBox(width: 10),
+            _StateDot(color: accentColor),
+            const SizedBox(width: 8),
             Expanded(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Wrap(
-                    alignment: WrapAlignment.center,
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    spacing: 4,
-                    runSpacing: 2,
-                    children: [powerButton, popupButton],
-                  ),
-                  const SizedBox(height: 4),
-                  ConfigCollectionScriptLabel(script: script, centered: true),
-                ],
-              ),
+              child: ConfigCollectionScriptLabel(script: script, centered: false),
             ),
+            powerButton,
+            popupButton,
           ],
         ),
-      );
-    }
-    return IntrinsicHeight(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          _RegularAccentBar(
-            key: ValueKey<String>('config-accent-bar-${script.name}'),
-            color: accentColor,
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ConfigCollectionScriptLabel(script: script, centered: false),
-                const SizedBox(height: 6),
-                ConfigCollectionTaskPreview(script: script),
-              ],
+        const SizedBox(height: 3),
+        Padding(
+          padding: const EdgeInsets.only(left: 16),
+          child: DefaultTextStyle(
+            style: TextStyle(
+              fontSize: 11,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? const Color(0xFF8A93AB)
+                  : const Color(0xFF9AA3B8),
             ),
+            child: ConfigCollectionTaskPreview(script: script),
           ),
-          const SizedBox(width: ConfigCollectionTile._actionSpacing),
-          powerButton,
-          popupButton,
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -226,27 +239,28 @@ class _DragCopyLoadingMask extends StatelessWidget {
   }
 }
 
-class _RegularAccentBar extends StatelessWidget {
-  const _RegularAccentBar({super.key, required this.color});
+class _StateDot extends StatelessWidget {
+  const _StateDot({required this.color});
 
   final Color color;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 6,
-      height: double.infinity,
-      child: Center(
-        child: FractionallySizedBox(
-          heightFactor: 0.8,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 160),
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(999),
-            ),
-          ),
-        ),
+    final glowing = color != MistPalette.stopGrey;
+    return Container(
+      width: 8,
+      height: 8,
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: glowing ? 1 : 0.5),
+        shape: BoxShape.circle,
+        boxShadow: glowing
+            ? [
+                BoxShadow(
+                  color: color.withValues(alpha: 0.7),
+                  blurRadius: 8,
+                ),
+              ]
+            : null,
       ),
     );
   }

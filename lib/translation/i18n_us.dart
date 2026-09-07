@@ -128,6 +128,12 @@ final Map<String, String> _us_ui = {
   I18n.homeConnectionRetryHint:
       'Please confirm the backend service has started and user settings are correct',
   I18n.homeConnectionRetryAction: 'Refresh',
+  I18n.mistConnected: 'Connected',
+  I18n.mistDisconnected: 'Disconnected',
+  I18n.mistStateRunning: 'Running',
+  I18n.mistStateWaiting: 'Waiting',
+  I18n.mistStateStopped: 'Stopped',
+  I18n.mistStateAbnormal: 'Abnormal',
   I18n.homeEmptyScriptHint: 'Add a config first',
   I18n.homeLoadingAutoDeploying: 'Auto deployment in progress, please wait',
   I18n.homeGoDeployPage: 'Go to deploy page',
