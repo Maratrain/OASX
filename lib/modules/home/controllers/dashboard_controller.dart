@@ -188,7 +188,7 @@ class HomeDashboardController extends GetxController {
   }
 
   bool isAllControlScriptsRunning() {
-    final scripts = validControlScripts;
+    final scripts = _effectiveControlScripts;
     if (scripts.isEmpty) {
       return false;
     }
@@ -199,11 +199,25 @@ class HomeDashboardController extends GetxController {
     );
   }
 
+  /// 总开关的操作对象：控制脚本列表为空时回退到当前激活脚本。
+  List<String> get _effectiveControlScripts {
+    final scripts = validControlScripts;
+    if (scripts.isNotEmpty) {
+      return scripts;
+    }
+    final active = activeScriptName.value.trim();
+    if (active.isNotEmpty &&
+        _scriptService.scriptModelMap.containsKey(active)) {
+      return [active];
+    }
+    return const [];
+  }
+
   Future<void> toggleAllControlScripts(bool enable) async {
     if (isBatchSwitching.value) {
       return;
     }
-    final scripts = validControlScripts;
+    final scripts = _effectiveControlScripts;
     if (scripts.isEmpty) {
       return;
     }
