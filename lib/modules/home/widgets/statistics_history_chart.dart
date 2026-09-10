@@ -89,6 +89,7 @@ class ScriptStatisticsHistoryChart extends StatelessWidget {
                 entry: entry,
                 metric: metric,
                 axisMax: axisMax,
+                ticks: ticks,
                 focused: entry.key == focusedTaskName,
                 flashing:
                     highlightRealtimeTask && flashingTaskName == entry.key,
@@ -244,6 +245,7 @@ class _HistoryBarRow extends StatelessWidget {
     required this.entry,
     required this.metric,
     required this.axisMax,
+    required this.ticks,
     required this.focused,
     required this.flashing,
     required this.flashToken,
@@ -253,6 +255,7 @@ class _HistoryBarRow extends StatelessWidget {
   final MapEntry<String, ScriptTaskStatistics> entry;
   final ScriptStatisticsChartMetric metric;
   final double axisMax;
+  final List<double> ticks;
   final bool focused;
   final bool flashing;
   final int flashToken;
@@ -260,84 +263,128 @@ class _HistoryBarRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = statisticsTaskColor(entry.key);
+    final scheme = Theme.of(context).colorScheme;
     final value = entry.value.metricValueFor(metric);
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        SizedBox(
-          width: _kHistoryTaskLabelWidth,
-          child: Text(
-            entry.key.tr,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: focused ? color : null,
-                  fontWeight: focused ? FontWeight.w700 : FontWeight.w500,
-                ),
-          ),
+    return InkWell(
+      borderRadius: BorderRadius.circular(10),
+      onTap: onTap,
+      child: Container(
+        height: _kHistoryRowHeight,
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        decoration: BoxDecoration(
+          color: focused
+              ? scheme.primary.withValues(alpha: 0.06)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(10),
         ),
-        const SizedBox(width: _kHistoryTaskLabelSpacing),
-        Expanded(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final ratio = axisMax <= 0 ? 0.0 : value / axisMax;
-              final barWidth =
-                  math.max(constraints.maxWidth * ratio, 8.0).toDouble();
-              final scheme = Theme.of(context).colorScheme;
-              return Tooltip(
-                preferBelow: false,
-                verticalOffset: 20,
-                message: _tooltipText(),
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(12),
-                  onTap: onTap,
-                  child: SizedBox(
-                    height: _kHistoryRowHeight,
-                    child: Stack(
-                      alignment: Alignment.centerLeft,
-                      children: [
-                        Container(
-                          height: 20,
-                          decoration: BoxDecoration(
-                            color: scheme.surfaceContainerHighest
-                                .withValues(alpha: 0.5),
-                            borderRadius: BorderRadius.circular(999),
-                          ),
-                        ),
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 220),
-                          curve: Curves.easeOutCubic,
-                          width: barWidth,
-                          height: focused ? 28 : 24,
-                          decoration: BoxDecoration(
-                            color:
-                                color.withValues(alpha: focused ? 0.92 : 0.76),
-                            borderRadius: BorderRadius.circular(999),
-                            border: Border.all(
-                              color: focused ? scheme.onSurface : color,
-                              width: focused ? 1.3 : 1,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: _kHistoryTaskLabelWidth,
+              child: Text(
+                entry.key.tr,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                      color: focused ? scheme.primary : null,
+                      fontWeight: focused ? FontWeight.w700 : FontWeight.w500,
+                    ),
+              ),
+            ),
+            const SizedBox(width: _kHistoryTaskLabelSpacing),
+            Expanded(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final width = constraints.maxWidth;
+                  final ratio =
+                      axisMax <= 0 ? 0.0 : (value / axisMax).clamp(0.0, 1.0);
+                  final barWidth =
+                      math.max(width * ratio, 8.0).toDouble();
+                  return Tooltip(
+                    preferBelow: false,
+                    verticalOffset: 20,
+                    message: _tooltipText(),
+                    child: SizedBox(
+                      height: _kHistoryRowHeight,
+                      child: Stack(
+                        alignment: Alignment.centerLeft,
+                        children: [
+                          for (final tick in ticks)
+                            if (tick > 0 && tick < axisMax)
+                              Positioned(
+                                left: width * tick / axisMax,
+                                top: 8,
+                                bottom: 8,
+                                width: 1,
+                                child: ColoredBox(
+                                  color: scheme.outlineVariant
+                                      .withValues(alpha: 0.28),
+                                ),
+                              ),
+                          Container(
+                            height: 20,
+                            decoration: BoxDecoration(
+                              color: scheme.surfaceContainerHighest
+                                  .withValues(alpha: 0.55),
+                              borderRadius: BorderRadius.circular(7),
                             ),
                           ),
-                        ),
-                        Positioned(
-                          right: 0,
-                          child: _HistoryValueBadge(
-                            label: formatStatisticsMetricByType(value, metric),
-                            color: color,
-                            flashing: flashing,
-                            flashToken: flashToken,
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 220),
+                            curve: Curves.easeOutCubic,
+                            width: barWidth,
+                            height: 20,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(7),
+                              gradient: LinearGradient(
+                                colors: [
+                                  Color.lerp(
+                                      scheme.primary, Colors.white, 0.22)!,
+                                  scheme.primary,
+                                ],
+                              ),
+                            ),
                           ),
-                        ),
-                      ],
+                          if (focused)
+                            Positioned(
+                              left: math.max(barWidth - 4.0, 0.0),
+                              child: Container(
+                                width: 8,
+                                height: 8,
+                                decoration: BoxDecoration(
+                                  color: scheme.surface,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: scheme.primary,
+                                    width: 1.6,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          Positioned(
+                            left: math.min(
+                              barWidth + 8.0,
+                              math.max(width - 56.0, 0.0),
+                            ),
+                            child: _HistoryValueBadge(
+                              label: formatStatisticsMetricByType(
+                                  value, metric),
+                              color: scheme.primary,
+                              flashing: flashing,
+                              flashToken: flashToken,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ),
-              );
-            },
-          ),
+                  );
+                },
+              ),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 

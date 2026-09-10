@@ -38,7 +38,7 @@ class HomeStatisticsController extends GetxController {
   final selectedTaskName = ''.obs;
 
   /// Metric currently shown by the chart.
-  final historyMetric = ScriptStatisticsChartMetric.totalDuration.obs;
+  final historyMetric = ScriptStatisticsChartMetric.runCount.obs;
 
   /// Sort field currently applied to the chart.
   final historySortField = ScriptStatisticsChartSortField.data.obs;
@@ -135,9 +135,6 @@ class HomeStatisticsController extends GetxController {
       return _taskEntriesCache;
     }
     final entries = currentStatistics.tasks.entries.where((entry) {
-      if (statisticsMetricUsesBattleFilter(metric)) {
-        return entry.value.battleCount > 0;
-      }
       return entry.value.runCount > 0;
     }).toList();
     entries.sort((left, right) {

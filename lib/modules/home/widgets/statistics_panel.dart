@@ -401,19 +401,14 @@ class _MetricDropdown extends StatelessWidget {
       options: options,
       value: value,
       onChanged: onChanged,
+      prefix: I18n.homeStatsMetricLabel.tr,
     );
   }
 
   /// Resolves the dropdown label for one metric.
   String _labelForMetric(ScriptStatisticsChartMetric metric) {
     return switch (metric) {
-      ScriptStatisticsChartMetric.totalDuration =>
-        I18n.homeStatsTotalDuration.tr,
       ScriptStatisticsChartMetric.runCount => I18n.homeStatsMetricRunCount.tr,
-      ScriptStatisticsChartMetric.battleCount =>
-        I18n.homeStatsMetricBattleCount.tr,
-      ScriptStatisticsChartMetric.battleAvgDuration =>
-        I18n.homeStatsMetricBattleAvgDuration.tr,
       ScriptStatisticsChartMetric.avgRunDuration =>
         I18n.homeStatsMetricAvgRunDuration.tr,
     };
@@ -451,6 +446,7 @@ class _SortFieldDropdown extends StatelessWidget {
       options: options,
       value: resolvedValue,
       onChanged: onChanged,
+      prefix: I18n.homeStatsSortLabel.tr,
     );
   }
 }
@@ -468,12 +464,16 @@ class _StatisticsPopupSelector<T> extends StatelessWidget {
     required this.value,
     required this.onChanged,
     this.minWidth = 0,
+    this.prefix = '',
   });
 
   final List<_StatisticsMenuOption<T>> options;
   final T value;
   final ValueChanged<T> onChanged;
   final double minWidth;
+
+  /// Label prefix shown before the selected value, e.g. "指标" / "排序".
+  final String prefix;
 
   @override
   Widget build(BuildContext context) {
@@ -483,6 +483,9 @@ class _StatisticsPopupSelector<T> extends StatelessWidget {
     if (resolvedOption == null) {
       return const SizedBox.shrink();
     }
+    final collapsedLabel = prefix.isEmpty
+        ? resolvedOption.label
+        : '$prefix：${resolvedOption.label}';
     return ConstrainedBox(
       constraints: BoxConstraints(minWidth: minWidth),
       child: Material(
@@ -511,7 +514,7 @@ class _StatisticsPopupSelector<T> extends StatelessWidget {
                 children: [
                   Flexible(
                     child: Text(
-                      resolvedOption.label,
+                      collapsedLabel,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),

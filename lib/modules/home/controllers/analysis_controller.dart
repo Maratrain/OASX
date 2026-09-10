@@ -49,14 +49,23 @@ class HomeAnalysisController extends GetxController {
   /// Selected run key (`task#index`), `''` shows all runs.
   final selectedRunKey = ''.obs;
 
-  /// Heatmap intensity in `0..100`.
-  final heatIntensity = 45.obs;
+  /// Whether click dots are drawn on the canvas.
+  final showClicks = true.obs;
 
   /// Whether swipe trails are drawn on the canvas.
   final showSwipes = true.obs;
 
+  /// Whether consecutive clicks are connected with order lines.
+  final showTrajectory = false.obs;
+
   /// Whether the canvas grid is drawn.
   final showGrid = true.obs;
+
+  /// Whether the canvas renders the aggregated density view.
+  final densityView = false.obs;
+
+  /// Battle count of the selected day, read from the statistics endpoint.
+  final battleCount = 0.obs;
 
   /// Replay playhead in milliseconds from the first operation.
   final replayOffsetMs = 0.obs;
@@ -162,8 +171,26 @@ class HomeAnalysisController extends GetxController {
           selectedRunKey.value = '';
         }
       }
+      unawaited(_loadBattleCount());
     } catch (_) {
       // Quiet refresh: keep showing the last good document.
+    }
+  }
+
+  /// Loads the selected day's battle count from the statistics endpoint.
+  /// Auxiliary for the analysis tab; failures keep the previous value.
+  Future<void> _loadBattleCount() async {
+    if (_boundScriptName.isEmpty || selectedDateKey.value.isEmpty) {
+      return;
+    }
+    try {
+      final stats = await ApiClient().getScriptStatisticsDay(
+        _boundScriptName,
+        selectedDateKey.value,
+      );
+      battleCount.value = stats.totalBattleCount;
+    } catch (_) {
+      // Keep the last known battle count on refresh errors.
     }
   }
 
@@ -234,6 +261,7 @@ class HomeAnalysisController extends GetxController {
     replayOffsetMs.value = 0;
     replayState.value = ScriptAnalysisReplayState.idle;
     analysis.value = null;
+    battleCount.value = 0;
     availableDateKeys.clear();
     try {
       final dates =
@@ -286,6 +314,7 @@ class HomeAnalysisController extends GetxController {
       }
       selectedRunKey.value = '';
       _resetReplay();
+      unawaited(_loadBattleCount());
       _syncTodayRefresh(result.dateKey == _todayKey());
     } catch (error) {
       if (token == _requestToken) {

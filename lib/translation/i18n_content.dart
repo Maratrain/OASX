@@ -196,8 +196,6 @@ class I18n {
       homeStatsGeneratedAt = 'home_stats_generated_at',
       homeStatsRetentionDays = 'home_stats_retention_days';
   static const String homeAnalysisTab = 'home_analysis_tab',
-      homeAnalysisClickTotal = 'home_analysis_click_total',
-      homeAnalysisSwipeTotal = 'home_analysis_swipe_total',
       homeAnalysisRuntime = 'home_analysis_runtime',
       homeAnalysisStatus = 'home_analysis_status',
       homeAnalysisStatusSuccess = 'home_analysis_status_success',
@@ -207,7 +205,12 @@ class I18n {
       homeAnalysisShowSwipes = 'home_analysis_show_swipes',
       homeAnalysisShowTrajectory = 'home_analysis_show_trajectory',
       homeAnalysisShowGrid = 'home_analysis_show_grid',
-      homeAnalysisIntensity = 'home_analysis_intensity',
+      homeAnalysisViewScatter = 'home_analysis_view_scatter',
+      homeAnalysisViewDensity = 'home_analysis_view_density',
+      homeAnalysisDensityFew = 'home_analysis_density_few',
+      homeAnalysisDensityMany = 'home_analysis_density_many',
+      homeAnalysisFailedRuns = 'home_analysis_failed_runs',
+      homeAnalysisBattleCount = 'home_analysis_battle_count',
       homeAnalysisTimelineReplay = 'home_analysis_timeline_replay',
       homeAnalysisAllTasks = 'home_analysis_all_tasks',
       homeAnalysisRunRecords = 'home_analysis_run_records',
@@ -223,10 +226,9 @@ class I18n {
       homeStatsBattleAvgDuration = 'home_stats_battle_avg_duration';
   static const String homeStatsAvgRunDuration = 'home_stats_avg_run_duration',
       homeStatsMetricRunCount = 'home_stats_metric_run_count',
-      homeStatsMetricBattleCount = 'home_stats_metric_battle_count';
-  static const String homeStatsMetricBattleAvgDuration =
-          'home_stats_metric_battle_avg_duration',
-      homeStatsMetricAvgRunDuration = 'home_stats_metric_avg_run_duration';
+      homeStatsMetricAvgRunDuration = 'home_stats_metric_avg_run_duration',
+      homeStatsMetricLabel = 'home_stats_metric_label',
+      homeStatsSortLabel = 'home_stats_sort_label';
   static const String homeStatsWaitingSnapshot = 'home_stats_waiting_snapshot',
       homeStatsConnected = 'home_stats_connected',
       homeStatsDisconnected = 'home_stats_disconnected';

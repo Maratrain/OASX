@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:oasx/modules/home/controllers/analysis_controller.dart';
@@ -103,7 +105,8 @@ class _AnalysisBody extends StatelessWidget {
 
   Widget _buildSummaryCards(BuildContext context) {
     final theme = Theme.of(context);
-    Widget card(String label, String value) {
+    final failedCount = day.runs.where((run) => run.failed).length;
+    Widget card(String label, String value, {Color? accent}) {
       return Expanded(
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
@@ -118,6 +121,7 @@ class _AnalysisBody extends StatelessWidget {
                 value,
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
+                  color: accent,
                 ),
               ),
               const SizedBox(height: 2),
@@ -135,13 +139,17 @@ class _AnalysisBody extends StatelessWidget {
 
     return Row(
       children: [
-        card(I18n.homeAnalysisClickTotal.tr, '${day.totalClickCount}'),
-        const SizedBox(width: 8),
-        card(I18n.homeAnalysisSwipeTotal.tr, '${day.totalSwipeCount}'),
+        card(I18n.homeAnalysisOpTotal.tr, '${day.totalOperationCount}'),
         const SizedBox(width: 8),
         card(
-            I18n.homeAnalysisRuntime.tr,
+            I18n.homeAnalysisFailedRuns.tr,
+            '$failedCount / ${day.runs.length}',
+            accent: failedCount > 0 ? theme.colorScheme.error : null),
+        const SizedBox(width: 8),
+        card(I18n.homeAnalysisRuntime.tr,
             _formatDuration(day.totalRuntimeSeconds)),
+        const SizedBox(width: 8),
+        card(I18n.homeAnalysisBattleCount.tr, '${controller.battleCount.value}'),
       ],
     );
   }
@@ -189,29 +197,43 @@ class _AnalysisBody extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              runSpacing: 6,
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                _CanvasToggle(
-                  label: I18n.homeAnalysisShowClicks.tr,
-                  value: true,
-                  onChanged: null,
+                Expanded(
+                  child: Wrap(
+                    spacing: 8,
+                    runSpacing: 6,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      _CanvasToggle(
+                        label: I18n.homeAnalysisShowClicks.tr,
+                        value: controller.showClicks.value,
+                        onChanged: (v) => controller.showClicks.value = v,
+                      ),
+                      _CanvasToggle(
+                        label: I18n.homeAnalysisShowSwipes.tr,
+                        value: controller.showSwipes.value,
+                        onChanged: (v) => controller.showSwipes.value = v,
+                      ),
+                      _CanvasToggle(
+                        label: I18n.homeAnalysisShowTrajectory.tr,
+                        value: controller.showTrajectory.value,
+                        onChanged: (v) => controller.showTrajectory.value = v,
+                      ),
+                      _CanvasToggle(
+                        label: I18n.homeAnalysisShowGrid.tr,
+                        value: controller.showGrid.value,
+                        onChanged: (v) => controller.showGrid.value = v,
+                      ),
+                      _DensityLegend(visible: controller.densityView.value),
+                    ],
+                  ),
                 ),
-                _CanvasToggle(
-                  label: I18n.homeAnalysisShowSwipes.tr,
-                  value: controller.showSwipes.value,
-                  onChanged: (v) => controller.showSwipes.value = v,
-                ),
-                _CanvasToggle(
-                  label: I18n.homeAnalysisShowTrajectory.tr,
-                  value: controller.showSwipes.value,
-                  onChanged: (v) => controller.showSwipes.value = v,
-                ),
-                _CanvasToggle(
-                  label: I18n.homeAnalysisShowGrid.tr,
-                  value: controller.showGrid.value,
-                  onChanged: (v) => controller.showGrid.value = v,
+                const SizedBox(width: 8),
+                _ViewSwitch(
+                  density: controller.densityView.value,
+                  onChanged: (v) => controller.densityView.value = v,
                 ),
               ],
             ),
@@ -228,42 +250,15 @@ class _AnalysisBody extends StatelessWidget {
                     operations: visible,
                     canvasWidth: day.canvasWidth,
                     canvasHeight: day.canvasHeight,
-                    intensity: controller.heatIntensity.value / 100.0,
+                    showClicks: controller.showClicks.value,
                     showSwipes: controller.showSwipes.value,
+                    showTrajectory: controller.showTrajectory.value,
                     showGrid: controller.showGrid.value,
+                    density: controller.densityView.value,
                   ),
                 ),
               );
             }),
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                SizedBox(
-                  width: 56,
-                  child: Text(
-                    I18n.homeAnalysisIntensity.tr,
-                    style: theme.textTheme.labelSmall,
-                  ),
-                ),
-                Expanded(
-                  child: Slider(
-                    value: controller.heatIntensity.value.toDouble(),
-                    min: 5,
-                    max: 100,
-                    divisions: 19,
-                    onChanged: (v) => controller.heatIntensity.value = v.round(),
-                  ),
-                ),
-                SizedBox(
-                  width: 40,
-                  child: Text(
-                    '${controller.heatIntensity.value}%',
-                    style: theme.textTheme.labelSmall,
-                    textAlign: TextAlign.end,
-                  ),
-                ),
-              ],
-            ),
           ],
         ),
       );
@@ -495,17 +490,21 @@ class _AnalysisCanvas extends StatelessWidget {
     required this.operations,
     required this.canvasWidth,
     required this.canvasHeight,
-    required this.intensity,
+    required this.showClicks,
     required this.showSwipes,
+    required this.showTrajectory,
     required this.showGrid,
+    required this.density,
   });
 
   final List<ScriptAnalysisOperation> operations;
   final int canvasWidth;
   final int canvasHeight;
-  final double intensity;
+  final bool showClicks;
   final bool showSwipes;
+  final bool showTrajectory;
   final bool showGrid;
+  final bool density;
 
   @override
   Widget build(BuildContext context) {
@@ -517,9 +516,11 @@ class _AnalysisCanvas extends StatelessWidget {
           operations: operations,
           canvasWidth: canvasWidth,
           canvasHeight: canvasHeight,
-          intensity: intensity,
+          showClicks: showClicks,
           showSwipes: showSwipes,
+          showTrajectory: showTrajectory,
           showGrid: showGrid,
+          density: density,
           gridColor: theme.colorScheme.outlineVariant.withValues(alpha: 0.25),
           clickColor: theme.colorScheme.primary,
           swipeColor: theme.colorScheme.tertiary,
@@ -530,14 +531,35 @@ class _AnalysisCanvas extends StatelessWidget {
   }
 }
 
+/// Heat gradient for the density view: blue -> purple -> red by count.
+Color scriptAnalysisHeatColor(double t) {
+  const stops = <(double, Color)>[
+    (0.0, Color(0xFF8FABFF)),
+    (0.45, Color(0xFF5B7CFA)),
+    (0.75, Color(0xFF9C4DF0)),
+    (1.0, Color(0xFFE53E3E)),
+  ];
+  for (var i = 0; i < stops.length - 1; i++) {
+    final (t0, c0) = stops[i];
+    final (t1, c1) = stops[i + 1];
+    if (t <= t1) {
+      final k = t <= t0 ? 0.0 : (t - t0) / (t1 - t0);
+      return Color.lerp(c0, c1, k)!;
+    }
+  }
+  return stops.last.$2;
+}
+
 class _AnalysisCanvasPainter extends CustomPainter {
   _AnalysisCanvasPainter({
     required this.operations,
     required this.canvasWidth,
     required this.canvasHeight,
-    required this.intensity,
+    required this.showClicks,
     required this.showSwipes,
+    required this.showTrajectory,
     required this.showGrid,
+    required this.density,
     required this.gridColor,
     required this.clickColor,
     required this.swipeColor,
@@ -547,13 +569,19 @@ class _AnalysisCanvasPainter extends CustomPainter {
   final List<ScriptAnalysisOperation> operations;
   final int canvasWidth;
   final int canvasHeight;
-  final double intensity;
+  final bool showClicks;
   final bool showSwipes;
+  final bool showTrajectory;
   final bool showGrid;
+  final bool density;
   final Color gridColor;
   final Color clickColor;
   final Color swipeColor;
   final Color textColor;
+
+  static const int _densityCols = 32;
+  static const int _densityRows = 18;
+  static const double _scatterIntensity = 0.45;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -562,49 +590,145 @@ class _AnalysisCanvasPainter extends CustomPainter {
     final swipes = operations.where((op) => op.isSwipe).toList(growable: false);
     final clicks = operations.where((op) => !op.isSwipe).toList(growable: false);
 
-    if (showSwipes) {
-      for (final op in swipes) {
-        canvas.drawLine(
-          _scale(op.x1, op.y1, size),
-          _scale(op.x2 ?? op.x1, op.y2 ?? op.y1, size),
-          Paint()
-            ..color = swipeColor.withValues(alpha: 0.65)
-            ..strokeWidth = 1.6,
+    if (density) {
+      _paintSwipes(canvas, size, swipes);
+      _paintDensity(canvas, size, clicks);
+      return;
+    }
+
+    _paintSwipes(canvas, size, swipes);
+
+    // Order lines connect consecutive clicks to expose the script path.
+    if (showTrajectory && clicks.length > 1) {
+      final path = Path()
+        ..moveTo(
+          _scaleX(clicks.first.x1, size.width),
+          _scaleY(clicks.first.y1, size.height),
+        );
+      for (final op in clicks.skip(1)) {
+        path.lineTo(_scaleX(op.x1, size.width), _scaleY(op.y1, size.height));
+      }
+      canvas.drawPath(
+        path,
+        Paint()
+          ..color = clickColor.withValues(alpha: 0.30)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.2,
+      );
+    }
+
+    if (showClicks) {
+      // Click hotspots: darker ink for higher local density.
+      const radius = 5.0 + 6.0 * _scatterIntensity;
+      final fillPaint = Paint()
+        ..color = clickColor.withValues(
+            alpha: (0.10 + 0.30 * _scatterIntensity).clamp(0.0, 1.0));
+      for (final op in clicks) {
+        canvas.drawCircle(_scale(op.x1, op.y1, size), radius, fillPaint);
+      }
+      final dotPaint = Paint()..color = clickColor.withValues(alpha: 0.85);
+      for (final op in clicks) {
+        canvas.drawCircle(_scale(op.x1, op.y1, size), 1.2, dotPaint);
+      }
+
+      // Draw the replay head position number for the newest few operations.
+      final recent = clicks.length.clamp(0, 1);
+      if (recent > 0 && clicks.isNotEmpty) {
+        final last = clicks.last;
+        final center = _scale(last.x1, last.y1, size);
+        final paint = TextPaint(textColor: textColor, fontSize: 10);
+        paint.paint(
+          canvas,
+          Offset(center.dx + 6, center.dy - 6),
+          '${clicks.length}',
         );
       }
     }
+  }
 
-    // Click hotspots: darker ink for higher local density.
-    final radius = 5.0 + 6.0 * intensity;
-    for (final op in clicks) {
-      final center = _scale(op.x1, op.y1, size);
-      canvas.drawCircle(
-        center,
-        radius,
+  void _paintSwipes(
+      Canvas canvas, Size size, List<ScriptAnalysisOperation> swipes) {
+    if (!showSwipes) {
+      return;
+    }
+    for (final op in swipes) {
+      canvas.drawLine(
+        _scale(op.x1, op.y1, size),
+        _scale(op.x2 ?? op.x1, op.y2 ?? op.y1, size),
         Paint()
-          ..color = clickColor.withValues(
-              alpha: (0.10 + 0.30 * intensity).clamp(0.0, 1.0)),
+          ..color = swipeColor.withValues(alpha: 0.65)
+          ..strokeWidth = 1.6,
       );
     }
-    for (final op in clicks) {
-      final center = _scale(op.x1, op.y1, size);
-      canvas.drawCircle(
-        center,
-        1.2,
-        Paint()..color = clickColor.withValues(alpha: 0.85),
-      );
-    }
+  }
 
-    // Draw the replay head position number for the newest few operations.
-    final recent = clicks.length.clamp(0, 1);
-    if (recent > 0 && clicks.isNotEmpty) {
-      final last = clicks.last;
-      final center = _scale(last.x1, last.y1, size);
-      final paint = TextPaint(textColor: textColor, fontSize: 10);
-      paint.paint(
+  /// Aggregated density view: 32x18 grid, stronger ink for more clicks,
+  /// top-5 hotspots labeled with their click counts.
+  void _paintDensity(
+      Canvas canvas, Size size, List<ScriptAnalysisOperation> clicks) {
+    if (clicks.isEmpty) {
+      return;
+    }
+    final cellW = canvasWidth / _densityCols;
+    final cellH = canvasHeight / _densityRows;
+    final counts = List.generate(
+        _densityRows, (_) => List.filled(_densityCols, 0));
+    var maxCount = 0;
+    for (final op in clicks) {
+      final col = math.min(_densityCols - 1, op.x1 ~/ cellW);
+      final row = math.min(_densityRows - 1, op.y1 ~/ cellH);
+      final next = counts[row][col] + 1;
+      counts[row][col] = next;
+      if (next > maxCount) {
+        maxCount = next;
+      }
+    }
+    if (maxCount <= 0) {
+      return;
+    }
+    final cellPaint = Paint();
+    final hotspots = <_HeatSpot>[];
+    for (var row = 0; row < _densityRows; row++) {
+      for (var col = 0; col < _densityCols; col++) {
+        final count = counts[row][col];
+        if (count <= 0) {
+          continue;
+        }
+        final t = math.sqrt(count / maxCount);
+        cellPaint.color = scriptAnalysisHeatColor(t)
+            .withValues(alpha: math.min(0.14 + 0.62 * t, 0.92));
+        canvas.drawRect(
+          Rect.fromPoints(
+            _scale(col * cellW, row * cellH, size),
+            _scale((col + 1) * cellW, (row + 1) * cellH, size),
+          ),
+          cellPaint,
+        );
+        hotspots.add((col, row, count));
+      }
+    }
+    hotspots.sort((a, b) => b.$3.compareTo(a.$3));
+    final labelStyle = TextPaint(textColor: const Color(0xFF1A2030), fontSize: 9);
+    for (final (col, row, count) in hotspots.take(5)) {
+      final t = math.sqrt(count / maxCount);
+      final center = _scale((col + 0.5) * cellW, (row + 0.5) * cellH, size);
+      final rect = Rect.fromCenter(
+          center: center, width: 34, height: 18);
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(rect, const Radius.circular(9)),
+        Paint()..color = Colors.white,
+      );
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(rect, const Radius.circular(9)),
+        Paint()
+          ..color = scriptAnalysisHeatColor(t)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1,
+      );
+      labelStyle.paint(
         canvas,
-        Offset(center.dx + 6, center.dy - 6),
-        '${clicks.length}',
+        Offset(center.dx - 8, center.dy - 5),
+        '$count',
       );
     }
   }
@@ -638,19 +762,124 @@ class _AnalysisCanvasPainter extends CustomPainter {
     }
   }
 
-  double _scaleX(int x, double width) => x / canvasWidth * width;
+  double _scaleX(num x, double width) => x / canvasWidth * width;
 
-  double _scaleY(int y, double height) => y / canvasHeight * height;
+  double _scaleY(num y, double height) => y / canvasHeight * height;
 
-  Offset _scale(int x, int y, Size size) =>
+  Offset _scale(num x, num y, Size size) =>
       Offset(_scaleX(x, size.width), _scaleY(y, size.height));
 
   @override
   bool shouldRepaint(covariant _AnalysisCanvasPainter oldDelegate) {
     return oldDelegate.operations != operations ||
-        oldDelegate.intensity != intensity ||
+        oldDelegate.showClicks != showClicks ||
         oldDelegate.showSwipes != showSwipes ||
-        oldDelegate.showGrid != showGrid;
+        oldDelegate.showTrajectory != showTrajectory ||
+        oldDelegate.showGrid != showGrid ||
+        oldDelegate.density != density;
+  }
+}
+
+/// Position + count of one aggregated density cell.
+typedef _HeatSpot = (int col, int row, int count);
+
+/// Scatter/density view switch shown at the end of the canvas toolbar.
+class _ViewSwitch extends StatelessWidget {
+  const _ViewSwitch({required this.density, required this.onChanged});
+
+  final bool density;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.all(2),
+      decoration: BoxDecoration(
+        color:
+            theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.7),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _segment(context, false, I18n.homeAnalysisViewScatter.tr, theme),
+          _segment(context, true, I18n.homeAnalysisViewDensity.tr, theme),
+        ],
+      ),
+    );
+  }
+
+  Widget _segment(BuildContext context, bool key, String label,
+      ThemeData theme) {
+    final selected = density == key;
+    return InkWell(
+      borderRadius: BorderRadius.circular(6),
+      onTap: selected ? null : () => onChanged(key),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        decoration: BoxDecoration(
+          color: selected ? theme.colorScheme.surface : Colors.transparent,
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Text(
+          label,
+          style: theme.textTheme.labelSmall?.copyWith(
+            color: selected
+                ? theme.colorScheme.primary
+                : theme.colorScheme.onSurfaceVariant,
+            fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Color ramp legend for the density view ("few -> many").
+class _DensityLegend extends StatelessWidget {
+  const _DensityLegend({required this.visible});
+
+  final bool visible;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!visible) {
+      return const SizedBox.shrink();
+    }
+    final theme = Theme.of(context);
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          I18n.homeAnalysisDensityFew.tr,
+          style: theme.textTheme.labelSmall
+              ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+        ),
+        const SizedBox(width: 6),
+        Container(
+          width: 90,
+          height: 8,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(4),
+            gradient: LinearGradient(
+              colors: [
+                scriptAnalysisHeatColor(0),
+                scriptAnalysisHeatColor(0.45),
+                scriptAnalysisHeatColor(0.75),
+                scriptAnalysisHeatColor(1),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(width: 6),
+        Text(
+          I18n.homeAnalysisDensityMany.tr,
+          style: theme.textTheme.labelSmall
+              ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+        ),
+      ],
+    );
   }
 }
 

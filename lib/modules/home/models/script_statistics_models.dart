@@ -15,10 +15,7 @@ enum ScriptStatisticsConnectionState {
 
 /// Chart metrics supported by the statistics view.
 enum ScriptStatisticsChartMetric {
-  totalDuration,
   runCount,
-  battleCount,
-  battleAvgDuration,
   avgRunDuration,
 }
 
@@ -154,10 +151,7 @@ class ScriptTaskRunRecord {
   /// Metric value used by the interaction summary.
   double metricValueFor(ScriptStatisticsChartMetric metric) {
     return switch (metric) {
-      ScriptStatisticsChartMetric.totalDuration => durationSeconds,
       ScriptStatisticsChartMetric.runCount => 1,
-      ScriptStatisticsChartMetric.battleCount => battleCount.toDouble(),
-      ScriptStatisticsChartMetric.battleAvgDuration => battleAvgDurationSeconds,
       ScriptStatisticsChartMetric.avgRunDuration => durationSeconds,
     };
   }
@@ -247,10 +241,7 @@ class ScriptTaskStatistics {
   /// Metric value used by the chart.
   double metricValueFor(ScriptStatisticsChartMetric metric) {
     return switch (metric) {
-      ScriptStatisticsChartMetric.totalDuration => totalDurationSeconds,
       ScriptStatisticsChartMetric.runCount => runCount.toDouble(),
-      ScriptStatisticsChartMetric.battleCount => battleCount.toDouble(),
-      ScriptStatisticsChartMetric.battleAvgDuration => battleAvgDurationSeconds,
       ScriptStatisticsChartMetric.avgRunDuration => avgRunDurationSeconds,
     };
   }
@@ -448,26 +439,8 @@ Future<ScriptStatisticsUpdate> parseScriptStatisticsUpdatePayloadAsync(
 /// Returns whether the metric should be formatted as a duration.
 bool statisticsMetricUsesDuration(ScriptStatisticsChartMetric metric) {
   return switch (metric) {
-    ScriptStatisticsChartMetric.totalDuration ||
-    ScriptStatisticsChartMetric.battleAvgDuration ||
-    ScriptStatisticsChartMetric.avgRunDuration =>
-      true,
-    ScriptStatisticsChartMetric.runCount ||
-    ScriptStatisticsChartMetric.battleCount =>
-      false,
-  };
-}
-
-/// Returns whether zero battle rows should be hidden for the metric.
-bool statisticsMetricUsesBattleFilter(ScriptStatisticsChartMetric metric) {
-  return switch (metric) {
-    ScriptStatisticsChartMetric.battleCount ||
-    ScriptStatisticsChartMetric.battleAvgDuration =>
-      true,
-    ScriptStatisticsChartMetric.totalDuration ||
-    ScriptStatisticsChartMetric.runCount ||
-    ScriptStatisticsChartMetric.avgRunDuration =>
-      false,
+    ScriptStatisticsChartMetric.avgRunDuration => true,
+    ScriptStatisticsChartMetric.runCount => false,
   };
 }
 
