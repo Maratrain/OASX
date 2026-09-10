@@ -581,7 +581,9 @@ class _AnalysisCanvasPainter extends CustomPainter {
 
   static const int _densityCols = 32;
   static const int _densityRows = 18;
-  static const double _scatterIntensity = 0.45;
+
+  /// Fixed ink strength for the scatter view, matching the old slider at 5%.
+  static const double _scatterIntensity = 0.05;
 
   @override
   void paint(Canvas canvas, Size size) {

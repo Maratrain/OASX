@@ -401,7 +401,6 @@ class _MetricDropdown extends StatelessWidget {
       options: options,
       value: value,
       onChanged: onChanged,
-      prefix: I18n.homeStatsMetricLabel.tr,
     );
   }
 
