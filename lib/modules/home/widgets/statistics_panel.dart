@@ -172,7 +172,7 @@ class _HeaderTopRow extends StatelessWidget {
               children: [
                 _StatusIcon(controller: controller),
                 const SizedBox(width: _kStatisticsSummarySpacing),
-                _HistoryDateDropdown(
+                HistoryDateDropdown(
                   values: availableDateKeys,
                   selectedValue: controller.selectedDateKey.value,
                   onChanged: controller.selectHistoryDate,
@@ -599,8 +599,10 @@ class _StatisticsPopupSelector<T> extends StatelessWidget {
   }
 }
 
-class _HistoryDateDropdown extends StatelessWidget {
-  const _HistoryDateDropdown({
+/// Date picker shared by the statistics and analysis tab headers.
+class HistoryDateDropdown extends StatelessWidget {
+  const HistoryDateDropdown({
+    super.key,
     required this.values,
     required this.selectedValue,
     required this.onChanged,

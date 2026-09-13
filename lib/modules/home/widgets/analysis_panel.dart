@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:oasx/modules/home/controllers/analysis_controller.dart';
 import 'package:oasx/modules/home/models/script_analysis_models.dart';
+import 'package:oasx/modules/home/widgets/statistics_panel.dart';
 import 'package:oasx/translation/i18n_content.dart';
 
 /// Analysis tab content: run summary, heat canvas and timeline replay.
@@ -72,10 +73,16 @@ class _AnalysisBody extends StatelessWidget {
     return Row(
         children: [
           Text(
-            '${day.scriptName} · ${day.dateKey}',
+            day.scriptName,
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w700,
             ),
+          ),
+          const SizedBox(width: 8),
+          HistoryDateDropdown(
+            values: controller.availableDateKeys.toList(growable: false),
+            selectedValue: controller.selectedDateKey.value,
+            onChanged: controller.selectDate,
           ),
           const SizedBox(width: 8),
           _TaskFilterMenu(controller: controller, day: day),
