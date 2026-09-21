@@ -9,7 +9,6 @@ import 'package:oasx/modules/home/widgets/config_workbench.dart';
 import 'package:oasx/modules/server/controllers/server_controller.dart';
 import 'package:oasx/service/script_service.dart';
 import 'package:oasx/translation/i18n_content.dart';
-import 'package:oasx/utils/check_version.dart';
 import 'package:oasx/utils/platform_utils.dart';
 
 part 'home_view_actions.dart';
@@ -50,11 +49,7 @@ class _HomeViewState extends State<HomeView> {
   @override
   void initState() {
     super.initState();
-    if (!PlatformUtils.isWeb) {
-      Future.delayed(const Duration(milliseconds: 300), () {
-        checkUpdate();
-      });
-    }
+    // 已禁用启动时的自动检查更新弹窗（改由侧边栏“更新”按钮手动触发）。
     WidgetsBinding.instance.addPostFrameCallback((_) {
       controller.checkStartupConnection();
     });
