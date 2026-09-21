@@ -30,16 +30,20 @@ class MistBrandHeader extends StatelessWidget {
         Container(
           width: 20,
           height: 20,
-          decoration: BoxDecoration(
-            gradient: MistPalette.accentGradient,
-            borderRadius: BorderRadius.circular(6),
-            boxShadow: const [
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(6)),
+            boxShadow: [
               BoxShadow(
                 color: Color(0x666B7CFA),
                 blurRadius: 10,
                 offset: Offset(0, 3),
               ),
             ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(6),
+            child: Image.asset('assets/images/Icon-app.png',
+                width: 20, height: 20, fit: BoxFit.cover),
           ),
         ),
         const SizedBox(width: 9),
