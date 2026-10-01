@@ -51,6 +51,7 @@ part 'cn_parts/cn_hyakkiyakou_config.dart';
 part 'cn_parts/cn_kokan_config.dart';
 part 'cn_parts/cn_six_realms_config.dart';
 part 'cn_parts/cn_frog_boss_config.dart';
+part 'cn_parts/cn_cub_war_config.dart';
 part 'cn_parts/cn_float_parade_config.dart';
 part 'cn_parts/cn_quiz_config.dart';
 part 'cn_parts/cn_herotest_config.dart';
@@ -134,6 +135,7 @@ class Messages extends Translations {
     ..._cn_kokan_config,
     ..._cn_six_realms_config,
     ..._cn_frog_boss_config,
+    ..._cn_cub_war_config,
     ..._cn_float_parade_config,
     ..._cn_quiz_config,
     ..._cn_herotest_config,
