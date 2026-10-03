@@ -57,4 +57,8 @@ final Map<String, String> _cn_rich_man_config = {
   'guild_store': '[寮]功勋商店',
   'skin_ticket': '皮肤券',
   'skin_ticket_help': '可选[0~5]',
+  'itachi_coin_shop': '鼬乐币商店',
+  'itachi_coin_buy_jade': '鼬乐币购买',
+  'itachi_coin_buy_jade_help':
+      '启用后进入鼬乐园商店，购买右侧自动前移的鼬乐礼盒；商品只尝试打开一次，三秒内未出现购买框则认为本周已购买。',
 };
