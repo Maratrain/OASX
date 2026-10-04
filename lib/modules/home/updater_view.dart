@@ -18,9 +18,21 @@ class UpdaterView extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const CircularProgressIndicator();
         } else if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
+          return Text(
+            '${I18n.updateCheckFailed.tr}: ${snapshot.error}',
+          );
         } else {
           UpdateInfoModel data = snapshot.data!;
+          if (data.isUpdate == null ||
+              data.branch == null ||
+              data.currentCommit == null ||
+              data.latestCommit == null ||
+              data.commit == null) {
+            return Text(
+              I18n.updaterInfoUnavailable.tr,
+              style: Theme.of(context).textTheme.bodyMedium,
+            );
+          }
           return SingleChildScrollView(
             child: content(data, context).paddingAll(20),
           );

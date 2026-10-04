@@ -92,6 +92,8 @@ final Map<String, String> _us_ui = {
   I18n.updateDownloading: 'Downloading update package',
   I18n.updatePreparing: 'Preparing update install',
   I18n.updateCheckFailed: 'Failed to check for updates',
+  I18n.updaterInfoUnavailable:
+      'Cannot fetch update info. Make sure the OAS server is running',
   I18n.updateDownloadFailed: 'Failed to download the update package',
   I18n.updateDownloadProgress: 'Downloaded @received / @total (@percent%)',
   I18n.updateDownloadProgressUnknown: 'Downloaded @received',

@@ -92,6 +92,7 @@ final Map<String, String> _cn_ui = {
   I18n.updateDownloading: '正在下载更新包',
   I18n.updatePreparing: '正在准备安装更新',
   I18n.updateCheckFailed: '检查更新失败',
+  I18n.updaterInfoUnavailable: '无法获取更新信息，请确认 OAS 后台服务已启动',
   I18n.updateDownloadFailed: '下载更新失败，请稍后重试',
   I18n.updateDownloadProgress: '已下载 @received / @total (@percent%)',
   I18n.updateDownloadProgressUnknown: '已下载 @received',

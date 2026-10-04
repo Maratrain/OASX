@@ -226,7 +226,8 @@ class _PrimaryNavigationRail extends StatelessWidget {
             selected: false,
             isDark: isDark,
             onTap: () => unawaited(
-              checkUpdate(showTip: true),
+              // 手动点击必须强制检查，否则会被 7 天静默窗口吞掉而毫无反馈
+              checkUpdate(showTip: true, forceCheck: true),
             ),
           ),
           const SizedBox(height: 2),
