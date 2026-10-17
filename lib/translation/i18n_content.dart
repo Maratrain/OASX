@@ -48,6 +48,11 @@ class I18n {
   static const String oasLatestVersion = 'OAS latest version',
       currentBranch = 'Current branch',
       detailedSubmissionHistory = 'Detailed submission history';
+  static const String oasSourceRepo = 'Source repo',
+      oasRepoBranch = 'Branch',
+      oasCommit = 'Commit',
+      oasRepoChipRefresh = 'Click to refresh',
+      oasRepoChipFromDeploy = 'Read from deploy.yaml';
   static const String author = 'Author',
       submitTime = 'Submit time',
       submitInfo = 'Submit info';

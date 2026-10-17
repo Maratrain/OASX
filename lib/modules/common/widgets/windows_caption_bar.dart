@@ -3,10 +3,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:window_manager/window_manager.dart';
 
+import 'package:oasx/modules/common/widgets/oas_repo_chip.dart';
 import 'package:oasx/modules/common/widgets/title.dart';
 
 const double _compactActionBaseThreshold = 280;
 const double _compactActionWidth = 48;
+
+/// 标题栏「仓库名 / 分支」指示在窗口过窄时的隐藏阈值。
+const double _repoChipThreshold = 560;
 
 class WindowsCaptionBar extends StatefulWidget implements PreferredSizeWidget {
   const WindowsCaptionBar({
@@ -89,6 +93,7 @@ class _WindowsCaptionBarState extends State<WindowsCaptionBar>
                   final hideTrailingActions = _shouldHideTrailingActions(
                     constraints.maxWidth,
                   );
+                  final showRepoChip = constraints.maxWidth > _repoChipThreshold;
                   return Row(
                     children: [
                       if (widget.onMenuPressed != null)
@@ -116,6 +121,7 @@ class _WindowsCaptionBarState extends State<WindowsCaptionBar>
                           widget.trailingActions.isNotEmpty)
                         const SizedBox(width: 8),
                       if (!hideTrailingActions) ...widget.trailingActions,
+                      if (showRepoChip) const OasRepoChip(),
                       const SizedBox(width: 8),
                     ],
                   );
