@@ -5,6 +5,7 @@ import 'package:oasx/modules/home/controllers/dashboard_controller.dart';
 import 'package:oasx/modules/home/models/home_workbench_layout.dart';
 import 'package:oasx/modules/home/widgets/log_center_panel.dart';
 import 'package:oasx/modules/home/widgets/analysis_panel.dart';
+import 'package:oasx/modules/home/widgets/resource_stat_panel.dart';
 import 'package:oasx/modules/home/widgets/statistics_panel.dart';
 import 'package:oasx/translation/i18n_content.dart';
 
@@ -57,6 +58,7 @@ class WorkbenchSidebarPanel extends StatelessWidget {
               Expanded(
                 child: switch (currentTab) {
                   HomeWorkbenchTab.stats => const ScriptStatisticsPanel(),
+                  HomeWorkbenchTab.resources => const ResourceStatPanel(),
                   HomeWorkbenchTab.analysis => const ScriptAnalysisPanel(),
                   HomeWorkbenchTab.logs =>
                     LogCenterPanel(scriptName: scriptName),
@@ -74,6 +76,7 @@ class WorkbenchSidebarPanel extends StatelessWidget {
   String _tabLabel(HomeWorkbenchTab value) {
     return switch (value) {
       HomeWorkbenchTab.stats => I18n.homeStatsTab.tr,
+      HomeWorkbenchTab.resources => I18n.resourceStatTab.tr,
       HomeWorkbenchTab.analysis => I18n.homeAnalysisTab.tr,
       HomeWorkbenchTab.logs => I18n.log.tr,
       _ => '',

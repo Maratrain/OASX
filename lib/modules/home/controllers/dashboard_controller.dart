@@ -58,11 +58,12 @@ enum HomeScriptStateFilter { all, running, abnormal, stopped, offline }
 enum HomeWorkbenchPage { scripts, workspace }
 
 /// Defines the visible home workbench tab for the active script.
-enum HomeWorkbenchTab { status, tasks, stats, logs, analysis }
+enum HomeWorkbenchTab { status, tasks, stats, resources, logs, analysis }
 
 /// Returns whether the tab belongs to the right desktop sidebar.
 bool isHomeWorkbenchSidebarTab(HomeWorkbenchTab value) {
   return value == HomeWorkbenchTab.stats ||
+      value == HomeWorkbenchTab.resources ||
       value == HomeWorkbenchTab.analysis ||
       value == HomeWorkbenchTab.logs;
 }
@@ -89,6 +90,7 @@ List<HomeWorkbenchTab> resolveHomeWorkbenchTabs(HomeWorkbenchLayoutMode mode) {
     HomeWorkbenchTab.tasks,
     HomeWorkbenchTab.logs,
     HomeWorkbenchTab.stats,
+    HomeWorkbenchTab.resources,
   ];
 }
 
@@ -99,7 +101,12 @@ List<HomeWorkbenchTab> resolveHomeWorkbenchSidebarTabs(
   if (mode != HomeWorkbenchLayoutMode.threePane) {
     return const [];
   }
-  return const [HomeWorkbenchTab.logs, HomeWorkbenchTab.stats, HomeWorkbenchTab.analysis];
+  return const [
+    HomeWorkbenchTab.logs,
+    HomeWorkbenchTab.stats,
+    HomeWorkbenchTab.resources,
+    HomeWorkbenchTab.analysis,
+  ];
 }
 
 class HomeDashboardController extends GetxController {

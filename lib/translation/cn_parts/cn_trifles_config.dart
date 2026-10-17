@@ -3,6 +3,7 @@ part of i18n;
 
 final Map<String, String> _cn_trifles_config = {
   'trifles': '每周必选',
+  'income_stat': '统计每日收益',
   'share_collect': '图鉴分享',
   'share_collect_help': '每周一张票、不要白不要',
   'share_area_boss': '地鬼分享',

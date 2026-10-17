@@ -28,6 +28,7 @@ part 'api_client_script.dart';
 part 'api_client_feedback.dart';
 part 'api_client_statistics.dart';
 part 'api_client_analysis.dart';
+part 'api_client_resource_stat.dart';
 part 'api_client_logs.dart';
 
 class ApiResult<T> {

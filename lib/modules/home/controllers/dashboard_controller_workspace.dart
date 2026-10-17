@@ -111,6 +111,15 @@ extension HomeDashboardWorkspaceX on HomeDashboardController {
     return activeWorkbenchTab.value == HomeWorkbenchTab.stats;
   }
 
+  /// Whether the resource statistics tab is currently displayed.
+  bool get isResourceStatVisibleInCurrentLayout {
+    if (workbenchLayoutMode.value == HomeWorkbenchLayoutMode.threePane) {
+      return displayedWorkbenchSidebarTabFor(workbenchLayoutMode.value) ==
+          HomeWorkbenchTab.resources;
+    }
+    return activeWorkbenchTab.value == HomeWorkbenchTab.resources;
+  }
+
   List<ScriptModel> get orderedScripts {
     final models = <ScriptModel>[];
     for (final name in _scriptService.scriptOrderList) {
