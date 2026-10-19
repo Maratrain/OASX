@@ -10,4 +10,6 @@ final Map<String, String> _cn_secret_config = {
   'layer_10': '挑战十层',
   'layer_10_help': '考虑到练度，这将不是默认打开的',
   'layer_9': '挑战九层',
+  'secret_share': '秘闻分享',
+  'secret_share_help': '通关秘闻第十层后，自动前往秘闻界面完成每周分享',
 };
