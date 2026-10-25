@@ -23,6 +23,9 @@ final Map<String, String> _cn_exploration_config = {
   'up_type': '选择UP类型',
   'up_type_help': '',
   'user_status_help_': '',
+  'chapter_achievement_sweep': '主线章节成就清扫',
+  'chapter_achievement_sweep_help':
+      '开启后扫描探索章节，对带成就宝箱的章节逐章进入困难模式击杀 boss，完成后去成就页统一领取奖励；连续失败 3 次或体力不足时中止，仅单人模式生效',
   'up_all': '全部',
   'up_exp': '经验',
   'up_coin': '金币',
