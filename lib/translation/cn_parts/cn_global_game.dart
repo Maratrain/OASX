@@ -78,6 +78,14 @@ final Map<String, String> _cn_global_game = {
   'costume_shikigami_3': '启程之刻',
   'costume_shikigami_4': '冥夜游火',
   'costume_shikigami_5': '契光水境',
+  'costume_shikigami_6': '月下火舞',
+  'costume_shikigami_7': '赤溟幽界',
+  'costume_shikigami_8': '童梦基地',
+  'costume_shikigami_9': '眠鹿之森',
+  'costume_shikigami_10': '今宵胧明',
+  'costume_shikigami_11': '花札幕台',
+  'costume_shikigami_12': '拾光之窗',
+  'costume_shikigami_13': '梦隙闲花',
   // ---------------------------------------------------------------------
   'costume_sign_default': '默认',
   // ---------------------------------------------------------------------
