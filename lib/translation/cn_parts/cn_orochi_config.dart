@@ -22,4 +22,11 @@ final Map<String, String> _cn_orochi_config = {
   'eleven_switch_help': '基于数字索引，悲鸣',
   'twelve_switch': '十二层御魂配置',
   'twelve_switch_help': '基于数字索引，神罚',
+  'check_true_orochi_enable': '检查真蛇',
+  'check_true_orochi_enable_help': '开启后会在任务结束后检测是否出现真蛇, 若出现则自动拉起真蛇',
+  'orochi_scrolls_cd_help': '绘卷模式下触发结界突破后，御魂任务暂停的间隔时间，到点后继续御魂（默认 30 分钟）',
+  'orochi_scrolls_enable_help': '绘卷模式：开启后御魂跑完后检测结界突破票数量，达到阈值后立即安排结界突破、绘卷任务，御魂按间隔时间延后再跑',
+  'orochi_scrolls_threshold_help': '绘卷模式的触发阈值：御魂跑完后当前结界突破票数量达到该值（默认 25 张）时触发',
+  'thirteen_switch': '虚无层切换御魂',
+  'thirteen_switch_help': '虚无',
 };

@@ -91,4 +91,48 @@ nemu_ipc仅限mumu12模拟器且要求版本大于3.8.13，并且需要设置模
   'launch_instance': '启动客户端实例',
   'launch_instance_help':
       '一次性按钮：点击后按上面的设置启动本配置对应的客户端，已在运行则跳过。\n它是按钮不是开关，点击后自动弹回，不会保存为开启。',
+  'next_run': '下次运行',
+  'priority': '优先级',
+  'success_interval': '成功间隔',
+  'failure_interval': '失败间隔',
+  'server_update': '服务器刷新',
+  'antiban_enable_help':
+      '开启后启用作息约束（睡眠时间窗、累计活跃上限、强制休息），用于避免24小时不间断/深夜连续运行这类服务端可见的异常行为特征。\n注意：点击/滑动的拟人化（真实按压时长、坐标高斯化、微动、压力抖动）始终生效，不受此开关控制。',
+  'auto_fill': '自动填充',
+  'auto_fill_help': '开启后使用智能放入寄养式神',
+  'close_emulator_limit_time': '关闭模拟器时限',
+  'close_emulator_limit_time_help': '此时间内不会关闭模拟器, 防止运行间隔时间短的多个任务导致反复开关模拟器',
+  'close_game_limit_time': '关闭游戏时限',
+  'close_game_limit_time_help': '此时间内不会关闭游戏, 防止运行间隔时间短的多个任务导致反复开关游戏',
+  'continuous_task_rest_enable': '连续任务间休息',
+  'continuous_task_rest_enable_help': '开启后，脚本在未进入任务等待状态的情况下连续执行达到随机间隔时，会暂停2至20分钟后再继续调度。功能独立于低配模式。',
+  'continuous_task_rest_interval': '连续任务休息间隔',
+  'continuous_task_rest_interval_help': '输入两个正整数，例如60,120。每轮连续执行开始时，在该范围内均匀随机抽取一个整数分钟作为本轮休息触发间隔。',
+  'daily_active_limit': '每日活跃上限',
+  'daily_active_limit_help':
+      '累计活跃时长达到此值后强制长休息一段（休息结束重新计）。设为 0 表示不限制。用于打破长时间不间断在线。格式：天 时:分:秒。',
+  'emulator_startup_lead_time': '模拟器启动提前量',
+  'emulator_startup_lead_time_help': '在开始运行任务之前提前启动模拟器的时间',
+  'enable_help': '是否启用',
+  'error_repeated': '多次出错关闭模拟器',
+  'failure_interval_help': '任务失败后的重试间隔',
+  'long_rest_duration': '长休息时长',
+  'long_rest_duration_help': '触发累计活跃上限后的强制休息时长。格式：天 时:分:秒。',
+  'low_spec_mode': '低配模式',
+  'low_spec_mode_help':
+      '默认关闭。开启后截图帧保留10秒，OCR请求超时提高到30秒并启用短期结果缓存，图像对比阈值保持不变。修改后需停止当前运行的脚本，再重新启动脚本生效。',
+  'priority_help': '任务优先级，多个任务同时到期时数值越小越先执行',
+  'resource_precache_enable': '资源预缓存',
+  'resource_precache_enable_help':
+      '默认关闭。开启后，脚本启动时会先将当前使用的OCR模型加载到OCR服务内存，预缓存完成后才开始执行任务。修改后需停止当前运行的脚本，再重新启动脚本生效。',
+  'restart_when_window_exists': '窗口已存在时重启',
+  'restart_when_window_exists_help':
+      'Restart 任务遇到桌面客户端时，若窗口还在，是否先杀掉再重新拉起（真正的重启），而不是只重走一次登录流程。\n开启后能救回卡在坏状态的客户端，但会中断正在手玩的客户端；默认关闭。',
+  'run_count': '执行次数',
+  'sleep_end': '睡眠窗结束',
+  'sleep_end_help': '退出睡眠时间窗、恢复运行的时刻。',
+  'sleep_start': '睡眠窗开始',
+  'sleep_start_help':
+      '进入睡眠时间窗的时刻。此区间内停止一切操作，并按“任务队列清空后”的空闲策略关闭游戏/模拟器，到点自动唤醒。支持跨午夜（如 23:00 到次日 06:00）。',
+  'success_interval_help': '任务成功后的额外等待间隔',
 };

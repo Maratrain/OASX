@@ -10,5 +10,7 @@ final Map<String, String> _cn_memory_scrolls_config = {
   'notification_95': '95%进度通知',
   'memory_scrolls_finish': '绘卷结束配置',
   'auto_finish_exploration': '自动结束探索',
-  'next_exploration_time': '下次探索时间'
+  'next_exploration_time': '下次探索时间',
+  'double_scrolls': '双倍绘卷',
+  'double_scrolls_help': '周年庆等活动出现双绘卷时，选择参与哪一份：默认绘卷一 或 双绘卷之二',
 };

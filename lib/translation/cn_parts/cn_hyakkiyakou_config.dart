@@ -52,4 +52,12 @@ final Map<String, String> _cn_hyakkiyakou_config = {
   'hya_screenshot_method': '撒豆过程的截图方式',
   'hya_screenshot': '',
   'hya_control_method': '撒豆过程的控制方式',
+  'hya_bean_threshold_low': '撒豆阈值下限',
+  'hya_bean_threshold_low_help': '剩余式神数量低于这个阈值时会自动强制10豆',
+  'hya_buff_add_beans': '优先加豆',
+  'hya_buff_freeze': '优先冰冻',
+  'hya_buff_prob_up': '优先概率提升',
+  'hya_buff_slow_down': '优先减速',
+  'hya_buff_speed_up': '优先加速',
+  'hya_onmyoji': '切换阴阳师',
 };

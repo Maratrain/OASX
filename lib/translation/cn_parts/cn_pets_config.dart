@@ -5,4 +5,7 @@ final Map<String, String> _cn_pets_config = {
   'pets_config': '小猫咪',
   'pets_happy': '其乐融融',
   'pets_feast': '饕餮大餐',
+  'enable_orochi_ten_once': '附带刷一次御魂',
+  'enable_switch_layer_soul': '按层数切换御魂',
+  'enable_switch_layer_soul_help': '使用八岐大蛇任务御魂的配置',
 };

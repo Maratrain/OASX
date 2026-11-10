@@ -91,4 +91,6 @@ final Map<String, String> _cn_find_jade_config = {
   'sup_account_list_48': '小号-48',
   'sup_account_list_49': '小号-49',
   'sup_account_list_50': '小号-50',
+  'invite_info_list': '邀请信息列表',
+  'sup_account_list': '小号信息列表',
 };

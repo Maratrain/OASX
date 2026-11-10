@@ -23,4 +23,23 @@ final Map<String, String> _cn_utilize_config = {
   'box_exp_waste': '从盒子提取经验时浪费一部分',
   'box_exp_waste_help':
       '某些时候寄养上存在满级的式神，收取经验盒子时会有提示，对于挂机玩家这点经验微不足道。如果不使能这一选项，将跳过收取经验盒子',
+  'harvest_guild_max_times': '收取寮卡上限次数',
+  'harvest_guild_max_times_help': '多次尝试收取, 防止寮资金/体力/抽奖/...有遗漏没做',
+  'lazy_mode': '怠惰模式',
+  'lazy_mode_help':
+      '开启后每次任务按权重随机进入怠惰模式；命中时不比较奖励数值，优先选择当前可见的五星及以上目标卡，否则选择首个符合策略的四星卡。',
+  'lazy_mode_weight': '怠惰模式收益权重',
+  'lazy_mode_weight_help': '取值范围0-1，默认1；0表示永不触发，1表示每次触发。',
+  'min_fish_value': '斗鱼最低收益',
+  'min_fish_value_help': '只蹭体力收益不低于此值的斗鱼卡（5星118-134，6星134-151），0为不限制',
+  'min_run_interval': '最短运行间隔',
+  'min_run_interval_help':
+      '防风控：两次蹭卡运行之间的最小间隔，避免蹭卡过于频繁被服务端标记。设为 0（默认）保持原逻辑（按结界卡剩余时间安排下次）。格式：天 时:分:秒。',
+  'min_taiko_value': '太鼓最低收益',
+  'min_taiko_value_help': '只蹭勾玉收益不低于此值的太鼓卡（5星59-67，6星67-76），0为不限制',
+  'utilize_enable': '启用挂卡',
+  'utilize_enable_help': '关闭则不会蹭卡, 但是其他操作会执行(例如收取寮奖励等)',
+  'utilize_harvest': '自动收取',
+  'utilize_harvest_help': '关闭则不领取, 可以屯奖励',
+  'search_switch': '探查御魂分组',
 };

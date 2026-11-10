@@ -11,4 +11,9 @@ final Map<String, String> _cn_meta_demon_ticket_config = {
   'leader': '队长',
   'member': '队员',
   'alone': '单刷',
+  'exploration_rotate': '探索自动添加候补式神',
+  'awake_buff_enable': '觉醒启用加成',
+  'awake_kirin_type': '觉醒麒麟',
+  'awake_layer': '觉醒层数',
+  'exploration_target': '探索目标',
 };

@@ -25,4 +25,10 @@ final Map<String, String> _cn_general_battle_config = {
   'green_main': '主力',
   'choose': '按位置点选',
   'name': '按式神名称识别',
+  'green_mark_type': '绿标类型',
+  'green_mark_name': '绿标式神名',
+  'battle_timeout': '战斗超时(秒)',
+  'continuous_battle': '连续战斗',
+  'max_continuous': '最大连战次数',
+  'quick_exit': '快速退出',
 };

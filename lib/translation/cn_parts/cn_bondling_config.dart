@@ -23,4 +23,11 @@ mode_3策略是刷到五个契灵后开始结契，选择高级、中级盘来�
   'azure_basan_switch': '设置火灵的御魂装配分组',
   'azure_basan_switch_help': '',
   'battle_config': '战斗设置',
+  'bondling_2_1_switch': '针女御魂分组',
+  'bondling_2_2_switch': '薙魂御魂分组',
+  'bondling_2_3_switch': '月魔兔御魂分组',
+  'bondling_2_4_switch': '狐火御魂分组',
+  'bondling_search_enable': '无契灵时自动探查',
+  'check_enable': '检查契忆数量',
+  'limit_num': '契忆数量上限',
 };

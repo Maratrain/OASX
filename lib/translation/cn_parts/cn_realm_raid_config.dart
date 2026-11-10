@@ -16,4 +16,6 @@ final Map<String, String> _cn_realm_raid_config = {
   'when_attack_fail_help': '''Exit：直接退出任务，标记为失败
 Continue：挑战其他的直至没有可挑战的才刷新
 Refresh：直接刷新，如果刷新操作进入CD，将标记为失败并退出''',
+  'level_cap': '卡级',
+  'level_cap_help': '勋章识别：满场 9 个可进攻结界中 6 个以上勋章为 0，判定等级漂移，连续撤退九场再刷新，直到漂移信号消失',
 };

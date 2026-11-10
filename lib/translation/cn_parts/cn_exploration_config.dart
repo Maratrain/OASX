@@ -30,4 +30,6 @@ final Map<String, String> _cn_exploration_config = {
   'up_exp': '经验',
   'up_coin': '金币',
   'up_daruma': '达摩',
+  'collect_paper_reward': '收取绘卷奖励',
+  'collect_paper_reward_help': '关闭则不收取直接退出',
 };

@@ -11,4 +11,10 @@ final Map<String, String> _cn_activation_config = {
   'exchange_max_help': '必选项',
   'shikigami_class': '寄养式神类型',
   'shikigami_class_help': '选择的式神类别（寄养默认选择N卡，且不建议选别的）',
+  'card_not_found_count': '未发现卡次数',
+  'card_type': '卡类型',
+  'last_card_type': '上次挂卡类型',
+  'min_fish_num': '斗鱼每小时最少收益',
+  'min_taiko_num': '太鼓每小时最少收益',
+  'pending_card_type': '待激活卡类型',
 };

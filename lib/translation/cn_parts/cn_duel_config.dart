@@ -9,4 +9,7 @@ final Map<String, String> _cn_duel_config = {
   'target_score_help': '3000以上表示为名士（也是自动斗技的最高）',
   'honor_full_exit': '刷满荣誉就退出',
   'honor_full_exit_help': '这无需关心本周荣誉的上限是什么',
+  'ban_name': '第五手禁选式神名',
+  'celeb_battle': '名仕战斗',
+  'initial_score': '初始斗技分',
 };

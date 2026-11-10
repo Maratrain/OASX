@@ -13,4 +13,8 @@ final Map<String, String> _cn_general_climb_config = {
   'battle_mode_help': '',
   'active_souls_clean': '结束爬塔后启动御魂整理',
   'active_souls_clean_help': '防止御魂溢出',
+  'pass_limit': '名帖爬塔次数',
+  'ap_limit': '体力爬塔上限',
+  'run_sequence': '运行顺序',
+  'random_sleep': '战斗前随机休息',
 };
