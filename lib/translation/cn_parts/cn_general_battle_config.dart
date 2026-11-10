@@ -17,4 +17,12 @@ final Map<String, String> _cn_general_battle_config = {
   'green_mark_help': '可选[左一, 左二, 左三, 左四, 左五, 主阴阳师]',
   'random_click_swipt_enable': '战斗时随机点击或者随机滑动',
   'random_click_swipt_enable_help': '防封优化，每三分钟的战斗可能触发0~8次，请注意这个与绿标功能冲突，可能会乱点绿标',
+  'green_left1': '一号位',
+  'green_left2': '二号位',
+  'green_left3': '三号位',
+  'green_left4': '四号位',
+  'green_left5': '五号位',
+  'green_main': '主力',
+  'choose': '按位置点选',
+  'name': '按式神名称识别',
 };

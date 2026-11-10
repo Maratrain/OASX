@@ -16,4 +16,6 @@ final Map<String, String> _cn_invite_config = {
   'wait_time_help': '保持默认一分钟就好，期间每隔20s邀请一次',
   'default_invite': '战斗结束后勾选默认邀请',
   'default_invite_help': '',
+  'auto_find': '自动寻找',
+  'recent_friend': '最近好友',
 };
