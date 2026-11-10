@@ -6,9 +6,11 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:oasx/config/theme.dart' show darkTheme, lightTheme;
 import 'package:oasx/modules/settings/controllers/settings_controller.dart';
+import 'package:oasx/modules/common/widgets/illustration_backdrop.dart';
 import 'package:oasx/service/app_exit_service.dart';
 import 'package:oasx/service/autostart_service.dart';
 import 'package:oasx/service/app_update_service.dart';
+import 'package:oasx/service/illustration_service.dart';
 import 'package:oasx/service/locale_service.dart';
 import 'package:oasx/service/script_service.dart';
 import 'package:oasx/service/system_tray_service.dart';
@@ -44,7 +46,10 @@ class OASXApp extends StatelessWidget {
       builder: (context) {
         return GetMaterialApp(
           debugShowCheckedModeBanner: false,
-          builder: DevicePreview.appBuilder,
+          builder: (context, child) => IllustrationBackdrop(
+            service: Get.find<IllustrationService>(),
+            child: DevicePreview.appBuilder(context, child),
+          ),
           scrollBehavior: GlobalBehavior(),
           translations: Messages(),
           locale: localeService.currentLocale,
@@ -78,9 +83,11 @@ Future<void> initService() async {
   }
   Get.lazyPut<WebSocketService>(() => WebSocketService(), fenix: true);
   final windowService = Get.put(WindowService());
+  final illustrationService = Get.put(IllustrationService(), permanent: true);
 
   await Future.wait([
     initLogger(),
+    illustrationService.initialize(),
     Get.putAsync(() async => LocaleService()),
     Get.putAsync(() async => ThemeService()),
     Get.putAsync(() async => AutoStartService(), permanent: true),

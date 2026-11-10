@@ -5,11 +5,13 @@ import 'package:styled_widget/styled_widget.dart';
 class SettingCard extends StatelessWidget {
   final String title;
   final List<SettingItem> items;
+  final Widget? footer;
 
   const SettingCard({
     super.key,
     required this.title,
     required this.items,
+    this.footer,
   });
 
   @override
@@ -33,6 +35,7 @@ class SettingCard extends StatelessWidget {
                 (item) => item.padding(bottom: 5),
               )
               .toList(),
+          if (footer != null) footer!,
         ].toColumn(crossAxisAlignment: CrossAxisAlignment.start),
       ),
     );

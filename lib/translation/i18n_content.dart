@@ -141,6 +141,21 @@ class I18n {
   static const String systemSetting = 'System setting',
       userSetting = 'User setting',
       noNewVersion = 'No new version';
+  static const String illustrationSetting = 'Illustration',
+      illustrationEnable = 'Enable illustration background',
+      illustrationTransparency = 'Transparency',
+      illustrationTransparencyHelp = '0% opaque, 100% fully transparent';
+  static const String illustrationInterval = 'Switch interval',
+      illustrationIntervalHelp = 'Integer, 10-60 seconds; default 15',
+      illustrationIntervalError = 'Enter an integer between 10 and 60';
+  static const String illustrationEmpty =
+      'No illustrations found; background and rotation stay disabled',
+      illustrationLoaded = '@count illustrations loaded this launch',
+      illustrationDirectory = 'Folder',
+      illustrationHelp =
+          'Put JPG/JPEG/PNG images into the pictures folder next to oasx.exe. Restart OASX after adding, replacing or removing images.',
+      illustrationLoadError =
+          'Cannot read the pictures folder, please check its read/write permission';
   static const String autoRunScriptList = 'Auto run script list',
       autoRunScript = 'Auto run script',
       startSuccess = 'Start success';

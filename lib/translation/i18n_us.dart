@@ -113,6 +113,21 @@ final Map<String, String> _us_ui = {
   I18n.username: 'Username',
   I18n.password: 'Password',
   I18n.userSetting: 'User settings',
+  I18n.illustrationSetting: 'Illustration',
+  I18n.illustrationEnable: 'Enable illustration background',
+  I18n.illustrationTransparency: 'Transparency',
+  I18n.illustrationTransparencyHelp: '0% opaque, 100% fully transparent',
+  I18n.illustrationInterval: 'Switch interval',
+  I18n.illustrationIntervalHelp: 'Integer, 10-60 seconds; default 15',
+  I18n.illustrationIntervalError: 'Enter an integer between 10 and 60',
+  I18n.illustrationEmpty:
+      'No illustrations found; background and rotation stay disabled',
+  I18n.illustrationLoaded: '@count illustrations loaded this launch',
+  I18n.illustrationDirectory: 'Folder',
+  I18n.illustrationHelp:
+      'Put JPG/JPEG/PNG images into the pictures folder next to oasx.exe. Restart OASX after adding, replacing or removing images.',
+  I18n.illustrationLoadError:
+      'Cannot read the pictures folder, please check its read/write permission',
   I18n.homeSelectControlScript: 'Select control scripts',
   I18n.homeOverviewControl: 'Overview and control',
   I18n.homeMasterSwitch: 'Master switch',

@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 
 import 'package:oasx/modules/common/widgets/appbar.dart';
 import 'package:oasx/modules/settings/oas_card.dart';
+import 'package:oasx/modules/settings/illustration_card.dart';
 import 'package:oasx/modules/settings/settings_leave_handler.dart';
 import 'package:oasx/modules/settings/system_card.dart';
 import 'package:oasx/modules/settings/user_card.dart';
@@ -33,6 +34,11 @@ class _SettingsViewState extends State<SettingsView> {
   final ScrollController _scrollController = ScrollController();
   final GlobalKey _scrollViewKey = GlobalKey();
   late final List<_SettingsSection> _sections = [
+    _SettingsSection(
+      key: GlobalKey(),
+      navTitleBuilder: () => I18n.illustrationSetting.tr,
+      cardBuilder: () => const IllustrationSettingsCard(),
+    ),
     _SettingsSection(
       key: GlobalKey(),
       navTitleBuilder: () => I18n.userSetting.tr,
