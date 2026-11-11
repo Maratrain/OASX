@@ -31,6 +31,7 @@ final Map<String, String> _cn_meta_demon_config = {
   'preset_groups': '预设组列表',
   'skip_equip_soul': '不装配御魂',
   'role': '鬼王协助身份',
+  'offering_star': '上供鬼王星级',
   'friend_names': '分享好友名字',
   'poll_interval': '协助轮询间隔（秒）',
 };

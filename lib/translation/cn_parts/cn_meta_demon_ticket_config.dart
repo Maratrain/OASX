@@ -16,4 +16,5 @@ final Map<String, String> _cn_meta_demon_ticket_config = {
   'awake_kirin_type': '觉醒麒麟',
   'awake_layer': '觉醒层数',
   'exploration_target': '探索目标',
+  'exploration_level': '探索章节',
 };
